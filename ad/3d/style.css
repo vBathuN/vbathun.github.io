@@ -81,9 +81,9 @@ body article {
 }
 
 .swiper .swiper-slide img {
-  width: 100%;
-  height: 520px;
-  margin-bottom: 25px;
+  width: 400px;
+  height: 570px;
+  
   border-radius: 5px;
 }
 
@@ -96,6 +96,6 @@ body article {
 
 @media (max-width: 750px) {
   .swiper .parallax-bg {
-    width: 320%;
+    width: 100%;
   }
 }

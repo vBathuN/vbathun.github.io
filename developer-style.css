@@ -64,6 +64,10 @@ header .desktop-nav a {
 
 /* Header - Hero */
 
+.hero-container {
+  hight: 700px;
+}
+
 header .hero-container {
   display: flex;
   justify-content: space-between;
@@ -123,7 +127,7 @@ header .hero-container .left h2:nth-of-type(2) {
 }
 
 .hero-container .right img {
-  height: 780px;
+  height: 680px;
 }
 
 /* Section */

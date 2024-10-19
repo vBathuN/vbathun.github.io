@@ -640,7 +640,7 @@ ul {
 
 .main-menu__logo {
   display: block;
-  padding: 8px 0;
+  padding: 6px 0;
   margin-right: 240px;
   z-index: 1;
 }
@@ -2217,7 +2217,7 @@ ul {
   background-image: -ms-linear-gradient(128.66deg, rgb(34, 34, 34) 0%, rgb(144, 81, 55) 57%, rgb(254, 127, 76) 100%);
   position: absolute;
   left: 0px;
-  top: 120px;
+  top: 70px;
   bottom: 0;
   width: 1130px;
   height: 867px;

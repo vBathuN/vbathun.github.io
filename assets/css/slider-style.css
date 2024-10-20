@@ -238,8 +238,8 @@ ul {
   outline: none !important;
   background-color: var(--zeena-base);
   color: var(--zeena-white);
-  font-size: 14px;
-  font-weight: 500;
+  font-size: 22px;
+  font-weight: 600;
   padding: 15px 20px 15px;
   padding-right: 13px;
   text-transform: uppercase;

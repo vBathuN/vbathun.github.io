@@ -2253,7 +2253,7 @@ ul {
 .main-slider__content {
   position: relative;
   display: block;
-  margin-top: -150px;
+  margin-top: -140px;
   z-index: 10;
 }
 

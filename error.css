@@ -1,0 +1,263 @@
+@layer reset, base, demo;
+
+@layer demo {
+  @-webkit-keyframes noise {
+    0% {
+      background-position-y: 0px;
+    }
+    100% {
+      background-position-y: -420px;
+    }
+  }
+  @keyframes noise {
+    0% {
+      background-position-y: 0px;
+    }
+    100% {
+      background-position-y: -420px;
+    }
+  }
+
+  body {
+    background: rgb(31, 31, 31);
+
+    box-shadow: 0px 0px 122px 25px black inset;
+    background-image: url("https://i.imgur.com/eg7VIun.jpg");
+    background-repeat: repeat;
+    -webkit-animation: noise 230ms steps(6) infinite;
+            animation: noise 230ms steps(6) infinite;
+  }
+
+  .glitch-wrapper {
+    -webkit-animation: glitch 2s linear infinite;
+            animation: glitch 2s linear infinite;
+  }
+
+  .glitch-text {
+    position: relative;
+    z-index: 2;
+    opacity: 0.9;
+    margin: 0 auto;
+    text-shadow: 0px 0px 3px white;
+    -webkit-animation: glitch 3s infinite;
+            animation: glitch 3s infinite;
+    cursor: pointer;
+    font-size: clamp(4rem, 5vw + 5rem, 6rem);
+    color: white;
+    &::before {
+      content: "ERROR 404";
+      color: black;
+      text-shadow: 0px 0px 5px 10px black;
+
+      filter: blur(7px);
+      display: block;
+      position: absolute;
+      z-index: -1;
+      font-size: 132px;
+      left: 0px;
+      right: 0px;
+      margin-top: -30px;
+      opacity: 0.5;
+    }
+  }
+
+  button {
+    display: block;
+    opacity: 0.6;
+    box-shadow: 0px 0px 3px 6px white, 0px 0px 3px white;
+    text-shadow: 0px 0px 3px black;
+    background: white;
+    border: 0px;
+    padding: 7px;
+    margin: 0 auto;
+    outline: none;
+    cursor: pointer;
+    margin-top: 30px;
+    font-size: 16px;
+    transition: 200ms;
+    :is(&:hover, &:focus, &:active) {
+      box-shadow: 0px 0px 3px 6px black;
+      text-shadow: 0px 0px 3px white;
+      background: black;
+      color: white;
+      transition: 200ms;
+      border-top-left-radius: 5px;
+      border-bottom-right-radius: 5px;
+    }
+  }
+
+  .paused {
+    -webkit-animation-play-state: paused;
+            animation-play-state: paused;
+  }
+
+  @-webkit-keyframes glitch {
+    3% {
+      text-shadow: 7px 7px 0px red;
+    }
+    6% {
+      text-shadow: -9px 4px 0px blue;
+      transform: translate(4px, -10px) skewX(3240deg);
+    }
+    7% {
+      text-shadow: 3px -4px 0px green;
+    }
+    9% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skewX(0deg);
+    }
+    2%,
+    54% {
+      transform: translateX(0px) skew(0deg);
+    }
+    55% {
+      transform: translate(-2px, 6px) skew(-5530deg);
+    }
+    56% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skew(0deg);
+    }
+    57% {
+      text-shadow: 7px 7px 0px red;
+      transform: translate(4px, -10px) skew(-70deg);
+    }
+    58% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skew(0deg);
+    }
+    62% {
+      text-shadow: 3px -4px 0px green;
+      transform: translate(0px, 20px) skew(0deg);
+    }
+    63% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(4px, -2px) skew(0deg);
+    }
+    64% {
+      transform: translate(1px, 3px) skew(-230deg);
+    }
+    65% {
+      transform: translate(-7px, 2px) skew(120deg);
+    }
+    66% {
+      transform: translate(0px, 0px) skew(0deg);
+    }
+  }
+
+  @keyframes glitch {
+    3% {
+      text-shadow: 7px 7px 0px red;
+    }
+    6% {
+      text-shadow: -9px 4px 0px blue;
+      transform: translate(4px, -10px) skewX(3240deg);
+    }
+    7% {
+      text-shadow: 3px -4px 0px green;
+    }
+    9% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skewX(0deg);
+    }
+    2%,
+    54% {
+      transform: translateX(0px) skew(0deg);
+    }
+    55% {
+      transform: translate(-2px, 6px) skew(-5530deg);
+    }
+    56% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skew(0deg);
+    }
+    57% {
+      text-shadow: 7px 7px 0px red;
+      transform: translate(4px, -10px) skew(-70deg);
+    }
+    58% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(0px, 0px) skew(0deg);
+    }
+    62% {
+      text-shadow: 3px -4px 0px green;
+      transform: translate(0px, 20px) skew(0deg);
+    }
+    63% {
+      text-shadow: 0px 0px 3px white;
+      transform: translate(4px, -2px) skew(0deg);
+    }
+    64% {
+      transform: translate(1px, 3px) skew(-230deg);
+    }
+    65% {
+      transform: translate(-7px, 2px) skew(120deg);
+    }
+    66% {
+      transform: translate(0px, 0px) skew(0deg);
+    }
+  }
+}
+
+@layer reset {
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+}
+
+@layer base {
+  body {
+    width: 100vw;
+    min-height: 100vh;
+    font-family: "Exo", "Bungee Shade", cursive, Arial, sans-serif;
+    background-color: #557;
+    color: #fff;
+    display: grid;
+    place-content: center;
+    padding: 1rem;
+  }
+
+  .tutorials {
+    opacity: 0;
+    position: fixed;
+    bottom: 1rem;
+    right: 1rem;
+    z-index: 9999;
+    width: 64px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: #3f517e;
+    padding: 0.5rem;
+    display: grid;
+    place-content: center;
+    transition: all 0.28s linear;
+
+    &:hover {
+      background: #4161b2;
+    }
+
+    & svg {
+      display: block;
+      width: 100%;
+      height: 100%;
+      filter: invert(1);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    ::before,
+    ::after {
+      -webkit-animation-delay: -1ms !important;
+              animation-delay: -1ms !important;
+      -webkit-animation-duration: 1ms !important;
+              animation-duration: 1ms !important;
+      -webkit-animation-iteration-count: 1 !important;
+              animation-iteration-count: 1 !important;
+      background-attachment: initial !important;
+      scroll-behavior: auto !important;
+      transition-duration: 0s !important;
+      transition-delay: 0s !important;
+    }
+  }
+}

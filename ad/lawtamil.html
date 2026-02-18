@@ -10,20 +10,23 @@
     <style>
         /* GitHub கோடில் இந்த பகுதியை மட்டும் மாற்றவும் */
 
+/* GitHub கோடில் <style> குறியீட்டிற்குள் இதை மாற்றவும் */
+
 body {
-    margin: 0;       /* சுற்றிலும் உள்ள இடைவெளியை நீக்க */
-    padding: 0;      /* Padding-ஐ கண்டிப்பாக நீக்க வேண்டும் */
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* Center-க்கு பதில் Top-ல் இருக்கட்டும் */
-    background-color: transparent; /* பின்னணி நிறம் தேவையில்லை */
-    overflow: hidden; /* ஸ்க்ரால் பார் வராமல் தடுக்க */
+    justify-content: center; /* இடது வலது நடுவில் */
+    align-items: flex-start; /* இதுதான் முக்கியம்: மேலே ஒட்ட வைக்கும் (Top Align) */
+    background-color: transparent;
+    overflow: hidden; /* ஸ்க்ரால் பார் வராமல் தடுக்கும் */
 }
 
-/* Desktop View Fix */
 #base {
-    margin: 0 auto;  /* இது சரியாக நடுவில் கொண்டு வரும் */
-    /* மற்றவை பழையபடியே இருக்கட்டும் */
+    margin-top: 0; /* மேலே இடைவெளி வேண்டாம் */
+    /* மற்ற #base ஸ்டைல்கள் அப்படியே இருக்கட்டும் */
 }
         /* -----------------------------------------
            BANNER CSS START

@@ -5,17 +5,14 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 <style>
-  /* 1. Body Reset: Iframe-க்குள் சரியாக அமர */
+  /* --- முக்கிய மாற்றம் இங்கே தான் --- */
   body {
     margin: 0;
     padding: 0;
-    width: 100%;
-    /* உயரம் 100vh கொடுக்கக்கூடாது, அதுதான் பிரச்சனை */
-    display: flex;
-    justify-content: center; /* கிடைமட்டமாக நடுவில் */
-    align-items: flex-start; /* செங்குத்தாக மேலே ஒட்ட வேண்டும் */
+    display: block;  /* Flex-ஐ நீக்கிவிட்டேன் */
+    text-align: center; /* கிடைமட்டமாக நடுவில் வர */
     background-color: transparent;
-    overflow: hidden; /* ஸ்க்ரால் பார் வராமல் தடுக்க */
+    overflow: hidden; 
   }
 
   /* 2. Fonts */
@@ -30,14 +27,16 @@
   /* 3. Base Container */
   #base {
     position: relative;
-    margin-top: 2px; /* மேலே லேசான இடைவெளி */
+    display: inline-block; /* text-align center-ல் வேலை செய்ய */
+    margin: 0 auto;        /* நடுவில் வர */
     width: 728px;
     height: 90px;
     border-radius: 8px;
-    box-shadow: 0px 5px 10px rgba(0,0,0,0.3); /* நிழலைச் சிறிது குறைத்துள்ளேன் */
+    box-shadow: 0px 5px 10px rgba(0,0,0,0.3);
     font-family: 'Segoe UI', Tahoma, sans-serif;
     overflow: hidden;
     background: #00478F;
+    text-align: left; /* உள்ளே இருக்கும் எழுத்துக்கள் இடதுபுறம் இருக்க */
   }
 
   .bg-navy { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(135deg, #001f4d 0%, #00478F 100%); z-index: 0; }
@@ -69,8 +68,20 @@
 
   /* --- MOBILE RESPONSIVE --- */
   @media screen and (max-width: 768px) {
-    body { height: auto; align-items: flex-start; overflow: visible; }
-    #base { width: 100%; height: auto; padding: 15px 0; display: block; border-radius: 0; box-shadow: none; margin-top: 0; }
+    body { 
+        height: auto; 
+        overflow: visible; 
+        padding-bottom: 10px; /* மொபைலில் கீழே சிறிது இடம் விட */
+    }
+    #base { 
+        display: block; /* மொபைலில் Block ஆக மாற வேண்டும் */
+        width: 100%; 
+        height: auto; 
+        padding: 15px 0; 
+        border-radius: 0; 
+        box-shadow: none; 
+        text-align: center; /* மொபைலில் அனைத்தும் சென்டர் */
+    }
     .content-wrapper { flex-direction: column; justify-content: center; gap: 15px; padding: 0; }
     .left-section { width: 100%; flex-direction: column; justify-content: center; text-align: center; }
     .scale-icon { font-size: 45px; margin-bottom: 5px; }

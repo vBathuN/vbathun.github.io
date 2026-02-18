@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neethiyin Thedal Logo</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+Tamil:wght@400;700;900&display=swap" rel="stylesheet">
+
+<style>
+/* --- 2. தமிழுக்கான Tamil039 Font இணைப்பு --- */
+@font-face {
+    font-family: 'Tamil039';
+    src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2'),
+         url('https://www.rtbs.in/font/Tamil039.woff') format('woff');
+    font-weight: bold;
+    font-style: normal;
+    font-display: swap;
+}
+
+
+:root {
+  --stroke-width: 5px; /* தமிழுக்கு ஸ்ட்ரோக் தடிமன் சிறிது குறைக்கப்பட்டுள்ளது */
+  --gold-gradient: linear-gradient(30deg, gold, rgb(139, 116, 12), gold);
+}
+
+*,
+::before,
+::after {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+body {
+  
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  /* தமிழ் ஃபான்ட் இங்கே அமைக்கப்பட்டுள்ளது */
+  font-family: 'Tamil039', 'Roboto', sans-serif;
+  flex-direction: column;
+  text-align: center;
+  overflow: hidden; /* ஸ்க்ரோல் பார் வராமல் தடுக்க */
+}
+
+/* முக்கிய தலைப்பு - நீதியின் தேடல் */
+.effect {
+  position: relative;
+  /* தமிழ் வார்த்தை நீளமாக இருப்பதால் எழுத்துரு அளவு சரிசெய்யப்பட்டுள்ளது */
+  font-size: 12vw; 
+  font-weight: 900; /* அதிக தடிமன் */
+  letter-spacing: 0.02em; /* தமிழுக்கு இடைவெளி அதிகம் தேவையில்லை */
+  line-height: 2;
+  white-space: nowrap; /* வார்த்தை உடையாமல் இருக்க */
+}
+
+.effect:before {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: var(--gold-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-stroke: var(--stroke-width) transparent;
+  z-index: 1;
+}
+
+.effect:after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle, white, transparent 50%) center / 25% 25%,
+    radial-gradient(circle, white, black 50%) center / 12.5% 12.5%;
+  -webkit-background-clip: text;
+  -webkit-text-stroke: var(--stroke-width) transparent;
+  mix-blend-mode: color-dodge;
+  animation: shine-animation 8s linear infinite; /* அனிமேஷன் வேகம் */
+  z-index: 2;
+}
+
+/* சிறிய திரைகளுக்கான மீடியா குவரி */
+@media (max-width: 768px) {
+    .effect { 
+        font-size: 40px; /* மொபைலில் அளவு குறைப்பு */
+        white-space: normal; /* மொபைலில் இரண்டு வரியாக வரலாம் */
+                letter-spacing: 3px;
+    }
+    .legal-icon { width: 50px; height: 50px; }
+}
+
+@keyframes shine-animation {
+  0% {
+    background-position: 0% 0%;
+  }
+  100% {
+    background-position: 100% -100%;
+  }
+}
+</style>
+</head>
+<body>
+
+  <h1 class="effect" data-text="சட்டவியல்">சட்டவியல்</h1>
+
+</body>
+</html>

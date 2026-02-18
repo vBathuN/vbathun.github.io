@@ -8,17 +8,23 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 
     <style>
-        /* பொதுவான Page Style (Banner-ஐ நடுவில் காட்ட) */
-        body {
-            margin: 0;
-            padding: 20px;
-            background-color: #f4f4f4; /* வெளியே தெரியும் பின்னணி நிறம் */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-        }
+        /* GitHub கோடில் இந்த பகுதியை மட்டும் மாற்றவும் */
 
+body {
+    margin: 0;       /* சுற்றிலும் உள்ள இடைவெளியை நீக்க */
+    padding: 0;      /* Padding-ஐ கண்டிப்பாக நீக்க வேண்டும் */
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; /* Center-க்கு பதில் Top-ல் இருக்கட்டும் */
+    background-color: transparent; /* பின்னணி நிறம் தேவையில்லை */
+    overflow: hidden; /* ஸ்க்ரால் பார் வராமல் தடுக்க */
+}
+
+/* Desktop View Fix */
+#base {
+    margin: 0 auto;  /* இது சரியாக நடுவில் கொண்டு வரும் */
+    /* மற்றவை பழையபடியே இருக்கட்டும் */
+}
         /* -----------------------------------------
            BANNER CSS START
            ----------------------------------------- */

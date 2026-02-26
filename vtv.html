@@ -113,13 +113,13 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // Label Name
+        // உங்கள் OBS முகவரி மற்றும் Label
         const LABEL_NAME = "jmain"; 
         const BLOG_RSS = `https://rss.rtbs.in/feeds/posts/default/-/${encodeURIComponent(LABEL_NAME)}?alt=rss`;
 
         async function initSyncSystem() {
             try {
-                // RSS to JSON API - இது பிளாக்கர் தரவுகளை ஸ்லைடருக்கு ஏற்றவாறு மாற்றும்
+                // rss2json API தரவுகளை இழுக்க
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await res.json();
 
@@ -140,48 +140,34 @@
                             </div>`;
                     });
 
-                    // தரவுகளை HTML-ல் சேர்த்தல்
-                    const $bg = $('#bg-slider').html(imgs);
-                    const $tt = $('#title-slider').html(titles);
+                    $('#bg-slider').html(imgs);
+                    $('#title-slider').html(titles);
 
                     // படங்களுக்கான ஸ்லைடர்
-                    $bg.owlCarousel({
-                        loop: true,
-                        items: 1,
-                        dots: false,
-                        nav: false,
-                        animateOut: 'fadeOut',
-                        animateIn: 'fadeIn',
-                        autoplay: true,
-                        autoplayTimeout: 9000,
-                        smartSpeed: 1000
+                    const owlBg = $('#bg-slider').owlCarousel({
+                        loop: true, items: 1, dots: false, nav: false,
+                        animateOut: 'fadeOut', animateIn: 'fadeIn',
+                        autoplay: true, autoplayTimeout: 9000, smartSpeed: 1000
                     });
 
                     // தலைப்புகளுக்கான ஸ்லைடர்
-                    $tt.owlCarousel({
-                        loop: true,
-                        items: 1,
-                        dots: false,
-                        nav: false,
-                        animateOut: 'fadeOut',
-                        animateIn: 'fadeInRight',
+                    const owlTitle = $('#title-slider').owlCarousel({
+                        loop: true, items: 1, dots: false, nav: false,
+                        animateOut: 'fadeOut', animateIn: 'fadeInRight',
                         smartSpeed: 1000
                     });
 
-                    // இரண்டு ஸ்லைடர்களையும் இணைக்கும் Sync முறை
-                    $bg.on('changed.owl.carousel', function(e) {
+                    // Sync முறை
+                    owlBg.on('changed.owl.carousel', function(e) {
                         let index = e.item.index - e.relatedTarget._clones.length / 2;
                         let count = e.item.count;
                         let realIndex = (index % count + count) % count;
-                        $tt.trigger('to.owl.carousel', [realIndex, 1000]);
+                        owlTitle.trigger('to.owl.carousel', [realIndex, 1000]);
                     });
 
-                } else {
-                    console.log("No items found for the label.");
-                    document.body.innerHTML += "<h2 style='color:white; position:absolute; top:50%; width:100%; text-align:center;'>No Posts Found with label: jmain</h2>";
                 }
             } catch (err) { 
-                console.error("Error fetching labeled feed:", err);
+                console.error("Error fetching feed:", err);
             }
         }
 

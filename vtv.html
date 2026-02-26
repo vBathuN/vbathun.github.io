@@ -12,16 +12,16 @@
     <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.theme.default.min.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ (Static Overlay) */
+        /* 1. சட்டவியல் லோகோ - நகராமல் நிலைநிறுத்தப்பட்டுள்ளது */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
             font-weight: bold; font-display: swap; 
         }
 
-        .centered-logo-box {
+        .logo-fixed-pos {
             position: absolute;
-            bottom: 230px; /* தலைப்பு பெட்டிக்கு மேல் */
+            bottom: 230px; /* தலைப்பு பெட்டிக்கு மேலே */
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
@@ -60,15 +60,15 @@
         /* 2. Layout Styles */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
         
-        .main-wrapper { 
+        .main-frame { 
             width: 100vw; height: 100vh; position: relative; 
             border: 15px solid #FFD700; box-sizing: border-box; 
         }
 
-        #bg-carousel { height: 100vh; z-index: 1; }
-        .full-stretch-img { width: 100%; height: 100vh; object-fit: fill; display: block; }
+        #bg-slider { height: 100vh; z-index: 1; }
+        .stretched-img { width: 100%; height: 100vh; object-fit: fill; display: block; }
 
-        #title-carousel {
+        #title-slider {
             position: absolute;
             bottom: 40px;
             left: 50%;
@@ -77,7 +77,7 @@
             z-index: 5000;
         }
 
-        .headline-red-box {
+        .red-headline-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 35px 20px;
             border: 5px solid #FFD700;
@@ -89,7 +89,7 @@
             justify-content: center;
         }
 
-        .news-headline {
+        .headline-text {
             color: #fff; font-size: 42px; font-weight: 900;
             font-family: 'Poppins', sans-serif; margin: 0;
             line-height: 1.2; text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
@@ -99,27 +99,27 @@
 
 <body>
 
-    <div class="main-wrapper">
-        <div class="centered-logo-box">
+    <div class="main-frame">
+        <div class="logo-fixed-pos">
             <div class="text-box"><span>சட்டவியல்</span></div>
             <div class="icon-box"><span>⚖️</span></div>
         </div>
 
-        <div id="bg-carousel" class="owl-carousel owl-theme"></div>
+        <div id="bg-slider" class="owl-carousel owl-theme"></div>
 
-        <div id="title-carousel" class="owl-carousel owl-theme"></div>
+        <div id="title-slider" class="owl-carousel owl-theme"></div>
     </div>
 
     <script src="assets/vendors/jquery/jquery-3.6.0.min.js"></script>
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        const BLOG_RSS_URL = "https://lawtamil.in/feeds/posts/default?alt=rss";
+        const BLOG_RSS = "https://lawtamil.in/feeds/posts/default?alt=rss";
 
-        async function startSystem() {
+        async function initSyncSystem() {
             try {
                 // பிளாக்கர் தரவுகளை இழுக்க (CORS பிழையைத் தவிர்க்கும் வழி)
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS_URL)}`);
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
                 const data = await res.json();
 
                 if (data.status === 'ok') {
@@ -127,25 +127,26 @@
                     let titles = "";
 
                     data.items.forEach(item => {
+                        // High Quality Image Extraction
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
                         
-                        imgs += `<div class="item"><img src="${img}" class="full-stretch-img"></div>`;
+                        imgs += `<div class="item"><img src="${img}" class="stretched-img"></div>`;
                         titles += `
                             <div class="item">
-                                <div class="headline-red-box">
-                                    <h2 class="news-headline">${item.title}</h2>
+                                <div class="red-headline-box">
+                                    <h2 class="headline-text">${item.title}</h2>
                                 </div>
                             </div>`;
                     });
 
-                    const $bg = $('#bg-carousel').html(imgs);
-                    const $tt = $('#title-carousel').html(titles);
+                    const $bg = $('#bg-slider').html(imgs);
+                    const $tt = $('#title-slider').html(titles);
 
                     // படங்களின் அனிமேஷன் (Fade In)
                     $bg.owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'fadeOut', animateIn: 'fadeIn',
-                        autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000
+                        autoplay: true, autoplayTimeout: 9000, smartSpeed: 1000
                     });
 
                     // தலைப்பு பெட்டியின் அனிமேஷன் (Slide From Right)
@@ -155,18 +156,17 @@
                         smartSpeed: 1000
                     });
 
-                    // இரண்டையும் ஒன்றாக இயக்கும் முறை (Sync)
+                    // இரண்டையும் ஒன்றாக இயக்கும் Sync முறை
                     $bg.on('translate.owl.carousel', function(e) {
                         $tt.trigger('to.owl.carousel', [e.item.index, 1000]);
                     });
                 }
             } catch (err) { 
                 console.error("Error:", err);
-                document.body.innerHTML = "<h1 style='color:white; text-align:center;'>Check Internet Connection</h1>";
             }
         }
 
-        $(document).ready(startSystem);
+        $(document).ready(initSyncSystem);
     </script>
 </body>
 </html>

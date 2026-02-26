@@ -20,13 +20,13 @@
             font-weight: bold; font-display: swap; 
         }
 
-        /* லோகோ பெட்டிக்கு மேல் சரியாக அமைய மாற்றம் */
+        /* லோகோவை பெட்டிக்கு வெளியே மேலே நிலைநிறுத்த மாற்றம் */
         .logo-fixed {
             position: absolute;
-            bottom: 100%; /* பெட்டியின் ஆரம்பப் புள்ளிக்கு மேல் */
+            bottom: 100%; /* பெட்டியின் மேல் விளிம்பிற்கு வெளியே */
             left: 50%;
             transform: translateX(-50%);
-            margin-bottom: -30px; /* பெட்டியுடன் லோகோவை இணைக்க */
+            margin-bottom: 5px; /* பெட்டிக்கும் லோகோவுக்கும் இடையில் சிறிய இடைவெளி */
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -86,7 +86,7 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            position: relative; /* லோகோ இதைப் பின்பற்றி அமைய */
+            position: relative; /* லோகோ இதை சார்ந்து அமைய */
         }
 
         /* தலைப்புகளுக்கு சட்டவியல் ஃபான்ட் மாற்றம் */
@@ -122,7 +122,7 @@
 
         async function initSyncSlider() {
             try {
-                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await response.json();
 
                 if (data.status === 'ok') {
@@ -164,8 +164,11 @@
                     });
 
                     // Syncing Title with Image Slider
-                    $imgSlider.on('translate.owl.carousel', function(event) {
-                        $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
+                    $imgSlider.on('changed.owl.carousel', function(event) {
+                        let index = event.item.index - event.relatedTarget._clones.length / 2;
+                        let count = event.item.count;
+                        let realIndex = (index % count + count) % count;
+                        $titleSlider.trigger('to.owl.carousel', [realIndex, 1000]);
                     });
                 }
             } catch (err) { console.error(err); }

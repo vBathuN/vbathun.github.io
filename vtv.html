@@ -114,12 +114,14 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        const BLOG_RSS = "https://rss.rtbs.in/feeds/posts/default?alt=rss";
+        // உங்களுக்கு வேண்டிய Label பெயரை இங்கே மாற்றவும்
+        const LABEL_NAME = "jmain"; 
+        const BLOG_RSS = `https://rss.rtbs.in/feeds/posts/default/-/${encodeURIComponent(LABEL_NAME)}?alt=rss`;
 
         async function initSyncSystem() {
             try {
-                // பிளாக்கர் தரவுகளை இழுக்க (CORS பிழையைத் தவிர்க்கும் வழி)
-                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
+                // பிளாக்கர் தரவுகளை இழுக்க (rss2json API)
+                const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await res.json();
 
                 if (data.status === 'ok') {
@@ -156,13 +158,13 @@
                         smartSpeed: 1000
                     });
 
-                    // இரண்டையும் ஒன்றாக இயக்கும் Sync முறை
+                    // Sync முறை
                     $bg.on('translate.owl.carousel', function(e) {
                         $tt.trigger('to.owl.carousel', [e.item.index, 1000]);
                     });
                 }
             } catch (err) { 
-                console.error("Error:", err);
+                console.error("Error fetching labeled feed:", err);
             }
         }
 

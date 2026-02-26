@@ -20,13 +20,13 @@
             font-weight: bold; font-display: swap; 
         }
 
-        /* லோகோ செய்திப் பெட்டிக்கு வெளியே அதன் மேலே அமர */
+        /* லோகோவை பெட்டிக்கு வெளியே மேலே நிலைநிறுத்த மாற்றம் */
         .logo-fixed {
             position: absolute;
             bottom: 100%; /* பெட்டியின் மேல் விளிம்பிற்கு வெளியே */
             left: 50%;
             transform: translateX(-50%);
-            margin-bottom: 5px; /* பெட்டிக்கும் லோகோவுக்கும் இடைவெளி */
+            margin-bottom: 5px; /* பெட்டிக்கும் லோகோவுக்கும் இடையில் சிறிய இடைவெளி */
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -62,11 +62,14 @@
 
         /* 2. Layout & Sync Sliders */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
+        
         .main-container { width: 100vw; height: 100vh; position: relative; border: 15px solid #FFD700; box-sizing: border-box; }
 
+        /* Image Slider */
         #image-slider { height: 100vh; z-index: 1; }
         .slide-img { width: 100%; height: 100vh; object-fit: fill; }
 
+        /* Title Slider (Red Box) */
         #title-slider {
             position: absolute;
             bottom: 40px;
@@ -83,10 +86,10 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            position: relative; /* லோகோவை இதைப் பின்பற்றி அமைய */
+            position: relative; /* லோகோ இதை சார்ந்து அமைய */
         }
 
-        /* தலைப்புகளுக்குச் சட்டவியல் ஃபான்ட் மாற்றம் */
+        /* தலைப்புகளுக்கு சட்டவியல் ஃபான்ட் மாற்றம் */
         .headline {
             color: #fff;
             font-size: 36px;
@@ -98,13 +101,16 @@
             padding-top: 10px;
         }
 
+        /* Owl Effects */
         .owl-carousel .owl-item { height: 100%; }
     </style>
 </head>
 
 <body>
+
     <div class="main-container">
         <div id="image-slider" class="owl-carousel owl-theme"></div>
+
         <div id="title-slider" class="owl-carousel owl-theme"></div>
     </div>
 
@@ -125,6 +131,7 @@
 
                     data.items.forEach(item => {
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
+                        
                         imgHtml += `<div class="item"><img src="${img}" class="slide-img"></div>`;
                         titleHtml += `
                             <div class="item">
@@ -138,24 +145,30 @@
                             </div>`;
                     });
 
-                    $('#image-slider').html(imgHtml);
-                    $('#title-slider').html(titleHtml);
+                    const $imgSlider = $('#image-slider').html(imgHtml);
+                    const $titleSlider = $('#title-slider').html(titleHtml);
 
-                    const $imgSlider = $('#image-slider').owlCarousel({
+                    // Image Slider Initialization
+                    $imgSlider.owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'slideOutDown', animateIn: 'fadeIn',
                         autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000,
                         mouseDrag: false, touchDrag: false
                     });
 
-                    const $titleSlider = $('#title-slider').owlCarousel({
+                    // Title Slider Initialization
+                    $titleSlider.owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'fadeOut', animateIn: 'fadeInRight', 
                         smartSpeed: 1000, mouseDrag: false, touchDrag: false
                     });
 
-                    $imgSlider.on('translate.owl.carousel', function(event) {
-                        $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
+                    // Syncing Title with Image Slider
+                    $imgSlider.on('changed.owl.carousel', function(event) {
+                        let index = event.item.index - event.relatedTarget._clones.length / 2;
+                        let count = event.item.count;
+                        let realIndex = (index % count + count) % count;
+                        $titleSlider.trigger('to.owl.carousel', [realIndex, 1000]);
                     });
                 }
             } catch (err) { console.error(err); }
@@ -164,4 +177,5 @@
         $(document).ready(initSyncSlider);
     </script>
 </body>
+
 </html>

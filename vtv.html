@@ -1,170 +1,135 @@
 <!DOCTYPE html>
-<html lang="ta">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RTBS || MOOT LIVE DYNAMIC FEED</title>
+    <title> RTBS || Dynamic Blogger Slider </title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,900;1,900&display=swap" rel="stylesheet">
     
     <link rel="stylesheet" href="assets/vendors/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/vendors/fontawesome/css/all.min.css" />
+    <link rel="stylesheet" href="assets/vendors/animate/animate.min.css" />
+    <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.carousel.min.css" />
+    <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.theme.default.min.css" />
     <link rel="stylesheet" href="assets/css/slider-style.css" />
     <link rel="stylesheet" href="assets/css/style-responsive.css" />
 
     <style>
-        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; font-family: 'Poppins', sans-serif; }
+        /* 9:16 OBS Optimization */
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+        .main-slider { height: 100vh; width: 100vw; }
+        .main-slider__slide { height: 100vh; position: relative; }
+        .main-slider__bg { background-size: cover; background-position: center; height: 100%; width: 100%; }
         
-        /* 9:16 Frame with Yellow Border */
-        .moot-frame {
-            width: 100vw;
-            height: 100vh;
-            border: 15px solid #FFD700; 
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            box-sizing: border-box;
-            background: #000;
-        }
-
-        /* Top Image Section */
-        .image-area {
-            flex: 1.5;
-            overflow: hidden;
-            position: relative;
-            background: #111;
-        }
-        .image-area img { width: 100%; height: 100%; object-fit: cover; }
-
-        /* MOOT LIVE Overlay Logo */
-        .moot-logo {
+        /* Your Red Box Style from Image */
+        .news-overlay-box {
             position: absolute;
-            bottom: 20px;
+            top: 50%;
             left: 50%;
-            transform: translateX(-50%);
-            background: #003399; /* Blue Box */
-            padding: 5px 20px;
-            border: 2px solid #fff;
-            color: #fff;
-            font-weight: 900;
-            font-size: 28px;
-            border-radius: 5px;
-        }
-
-        /* Red News Box (படத்தில் உள்ளது போன்றது) */
-        .news-container {
-            flex: 1;
-            background: url('assets/images/backgrounds/slider-1-2.jpg') no-repeat center center;
-            background-size: cover;
-            position: relative;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 40px;
-        }
-
-        .red-ticker-box {
-            background: #CC0000;
+            transform: translate(-50%, -50%);
             width: 90%;
-            padding: 25px;
-            border-radius: 15px;
+            background: #CC0000;
+            padding: 30px;
             border: 4px solid #FFD700;
+            border-radius: 15px;
             text-align: center;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
-            margin-top: -60px; /* Overlap effect */
-            z-index: 100;
+            z-index: 10;
         }
-
-        .news-headline {
+        .news-title-text {
             color: #fff;
-            font-size: 32px;
+            font-size: 35px;
             font-weight: 800;
-            line-height: 1.4;
+            line-height: 1.3;
             margin: 0;
+            font-family: 'Poppins', sans-serif;
         }
-
-        /* Bottom Brand Details */
-        .brand-footer {
-            margin-top: auto;
-            padding-bottom: 30px;
-            text-align: center;
+        .moot-tag {
+            background: #003399;
             color: #fff;
-        }
-
-        .contact-btn {
-            background: #E61E25;
-            color: #fff;
-            padding: 10px 25px;
-            font-size: 24px;
-            font-weight: bold;
-            border-radius: 8px;
+            padding: 5px 15px;
+            font-weight: 900;
             display: inline-block;
-            margin-top: 15px;
+            margin-bottom: 15px;
+            border: 2px solid #fff;
         }
     </style>
 </head>
 
-<body>
+<body class="custom-cursor">
 
-    <div class="moot-frame" id="feed-container">
-        <div style="color:white; text-align:center; padding-top:50%;">செய்திகள் ஏற்றப்படுகின்றன...</div>
-    </div>
+    <section class="main-slider" id="home">
+        <div class="main-slider__carousel owl-carousel owl-theme thm-owl__carousel" id="dynamic-slider">
+            <div class="item">
+                <h2 style="color:white; text-align:center; padding-top:50vh;">செய்திகள் ஏற்றப்படுகின்றன...</h2>
+            </div>
+        </div>
+    </section>
+
+    <script src="assets/vendors/jquery/jquery-3.6.0.min.js"></script>
+    <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // உங்கள் பிளாக்கர் முகவரி
-        const BLOG_URL = "https://lawtamil.in/feeds/posts/default?alt=rss";
+        const BLOG_RSS = "https://lawtamil.in/feeds/posts/default?alt=rss";
 
-        async function fetchBloggerData() {
+        async function initBloggerSlider() {
             try {
-                // RSS-ஐ JSON-ஆக மாற்றும் API (CORS பிழையைத் தவிர்க்கும்)
-                const api_url = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_URL)}`;
-                const response = await fetch(api_url);
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
                 const data = await response.json();
 
                 if (data.status === 'ok') {
-                    const item = data.items[0]; // முதல் செய்தி
-                    const title = item.title;
-                    
-                    // படத்தின் URL-ஐ எடுக்கும் முறை
-                    let imgUrl = item.thumbnail || item.enclosure.link;
-                    if(!imgUrl) {
-                        // Content-க்குள் படம் இருந்தால் அதை எடுக்கும்
-                        const div = document.createElement('div');
-                        div.innerHTML = item.content;
-                        const firstImg = div.querySelector('img');
-                        imgUrl = firstImg ? firstImg.src : 'assets/images/resources/logo-1.png';
-                    }
+                    let sliderHTML = "";
 
-                    const htmlContent = `
-                        <div class="image-area">
-                            <img src="${imgUrl}" alt="Live Update">
-                            <div class="moot-logo">MOOT LIVE</div>
-                        </div>
-                        
-                        <div class="news-container">
-                            <div class="red-ticker-box">
-                                <h2 class="news-headline">${title}</h2>
-                            </div>
+                    data.items.forEach(item => {
+                        // High Quality Image Extraction
+                        let imgUrl = item.thumbnail || item.enclosure.link;
+                        if (!imgUrl || imgUrl.includes('s72-c')) {
+                            const container = document.createElement('div');
+                            container.innerHTML = item.content;
+                            const firstImg = container.querySelector('img');
+                            imgUrl = firstImg ? firstImg.src : 'assets/images/backgrounds/slider-1-1.jpg';
+                        }
+                        // Change thumbnail to full size
+                        imgUrl = imgUrl.replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
 
-                            <div class="brand-footer">
-                                <p style="font-size: 20px; margin-bottom: 5px;">Secure Peer-to-Peer Audio Video Transmission</p>
-                                <h1 style="font-weight: 900; margin: 0; font-size: 40px;">RTBS Web 3.0</h1>
-                                <p style="font-size: 18px;">The Real Time Broadcasting Solution</p>
-                                <div class="contact-btn">+91 72000 81010</div>
+                        sliderHTML += `
+                        <div class="item">
+                            <div class="main-slider__slide">
+                                <div class="main-slider__bg" style="background-image: url(${imgUrl});"></div>
+                                <div class="news-overlay-box">
+                                    <div class="moot-tag">MOOT LIVE</div>
+                                    <h2 class="news-title-text">${item.title}</h2>
+                                </div>
                             </div>
-                        </div>
-                    `;
-                    document.getElementById('feed-container').innerHTML = htmlContent;
+                        </div>`;
+                    });
+
+                    const $slider = $('#dynamic-slider');
+                    $slider.trigger('destroy.owl.carousel'); // Reset slider
+                    $slider.html(sliderHTML);
+
+                    // Re-initialize Owl Carousel with your Original Effects
+                    $slider.owlCarousel({
+                        loop: true,
+                        items: 1,
+                        nav: false,
+                        dots: true,
+                        animateOut: 'fadeOut', // Your original fade effect
+                        animateIn: 'fadeIn',
+                        smartSpeed: 1000,
+                        autoplay: true,
+                        autoplayTimeout: 7000,
+                        autoplayHoverPause: false
+                    });
                 }
             } catch (error) {
-                console.error("Error fetching feed:", error);
-                document.getElementById('feed-container').innerHTML = `<h1 style="color:white; text-align:center; padding-top:40%;">பிணைய இணைப்பைச் சரிபார்க்கவும்!</h1>`;
+                console.error("Slider Error:", error);
             }
         }
 
-        // தொடக்கத்தில் ஒருமுறை இயக்கு
-        fetchBloggerData();
-        // 5 நிமிடத்திற்கு ஒருமுறை தானாகப் புதுப்பிக்க
-        setInterval(fetchBloggerData, 300000);
+        $(document).ready(initBloggerSlider);
     </script>
 </body>
 </html>

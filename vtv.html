@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.theme.default.min.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ - நகராமல் நிலைநிறுத்தப்பட்டுள்ளது */
+        /* 1. சட்டவியல் லோகோ */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
@@ -21,7 +21,7 @@
 
         .logo-fixed-pos {
             position: absolute;
-            bottom: 230px; /* தலைப்பு பெட்டிக்கு மேலே */
+            bottom: 230px; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 9999;
@@ -106,7 +106,6 @@
         </div>
 
         <div id="bg-slider" class="owl-carousel owl-theme"></div>
-
         <div id="title-slider" class="owl-carousel owl-theme"></div>
     </div>
 
@@ -114,22 +113,22 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // உங்களுக்கு வேண்டிய Label பெயரை இங்கே மாற்றவும்
+        // Label Name
         const LABEL_NAME = "jmain"; 
         const BLOG_RSS = `https://rss.rtbs.in/feeds/posts/default/-/${encodeURIComponent(LABEL_NAME)}?alt=rss`;
 
         async function initSyncSystem() {
             try {
-                // பிளாக்கர் தரவுகளை இழுக்க (rss2json API)
+                // RSS to JSON API - இது பிளாக்கர் தரவுகளை ஸ்லைடருக்கு ஏற்றவாறு மாற்றும்
                 const res = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await res.json();
 
-                if (data.status === 'ok') {
+                if (data.status === 'ok' && data.items.length > 0) {
                     let imgs = "";
                     let titles = "";
 
                     data.items.forEach(item => {
-                        // High Quality Image Extraction
+                        // உயர்தரப் படங்களை எடுத்தல்
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
                         
                         imgs += `<div class="item"><img src="${img}" class="stretched-img"></div>`;
@@ -141,27 +140,45 @@
                             </div>`;
                     });
 
+                    // தரவுகளை HTML-ல் சேர்த்தல்
                     const $bg = $('#bg-slider').html(imgs);
                     const $tt = $('#title-slider').html(titles);
 
-                    // படங்களின் அனிமேஷன் (Fade In)
+                    // படங்களுக்கான ஸ்லைடர்
                     $bg.owlCarousel({
-                        loop: true, items: 1, dots: false, nav: false,
-                        animateOut: 'fadeOut', animateIn: 'fadeIn',
-                        autoplay: true, autoplayTimeout: 9000, smartSpeed: 1000
-                    });
-
-                    // தலைப்பு பெட்டியின் அனிமேஷன் (Slide From Right)
-                    $tt.owlCarousel({
-                        loop: true, items: 1, dots: false, nav: false,
-                        animateOut: 'fadeOut', animateIn: 'fadeInRight',
+                        loop: true,
+                        items: 1,
+                        dots: false,
+                        nav: false,
+                        animateOut: 'fadeOut',
+                        animateIn: 'fadeIn',
+                        autoplay: true,
+                        autoplayTimeout: 9000,
                         smartSpeed: 1000
                     });
 
-                    // Sync முறை
-                    $bg.on('translate.owl.carousel', function(e) {
-                        $tt.trigger('to.owl.carousel', [e.item.index, 1000]);
+                    // தலைப்புகளுக்கான ஸ்லைடர்
+                    $tt.owlCarousel({
+                        loop: true,
+                        items: 1,
+                        dots: false,
+                        nav: false,
+                        animateOut: 'fadeOut',
+                        animateIn: 'fadeInRight',
+                        smartSpeed: 1000
                     });
+
+                    // இரண்டு ஸ்லைடர்களையும் இணைக்கும் Sync முறை
+                    $bg.on('changed.owl.carousel', function(e) {
+                        let index = e.item.index - e.relatedTarget._clones.length / 2;
+                        let count = e.item.count;
+                        let realIndex = (index % count + count) % count;
+                        $tt.trigger('to.owl.carousel', [realIndex, 1000]);
+                    });
+
+                } else {
+                    console.log("No items found for the label.");
+                    document.body.innerHTML += "<h2 style='color:white; position:absolute; top:50%; width:100%; text-align:center;'>No Posts Found with label: jmain</h2>";
                 }
             } catch (err) { 
                 console.error("Error fetching labeled feed:", err);

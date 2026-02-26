@@ -4,156 +4,152 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> RTBS || Live Blogger Feed </title>
-    
+    <title> RTBS || Live Blogger News </title>
+    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicons/apple-touch-icon.png" />
+    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicons/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/favicon-16x16.png" />
+    <link rel="manifest" href="assets/images/favicons/site.webmanifest" />
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap" rel="stylesheet">
+
     <link rel="stylesheet" href="assets/vendors/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/vendors/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/slider-style.css" />
     <link rel="stylesheet" href="assets/css/style-responsive.css" />
 
     <style>
-        /* OBS & 9:16 Custom Styling */
-        body {
-            background-color: transparent;
+        /* 9:16 OBS Full Screen Layout */
+        body, html {
             margin: 0;
             padding: 0;
-            overflow-x: hidden;
-        }
-
-        .obs-feed-container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 15px;
-            width: 1080px; /* OBS Width */
-        }
-
-        .feed-item {
-            position: relative;
-            width: 100%;
-            height: 1920px; /* OBS Height for 9:16 */
-            background: #000;
-            border-radius: 25px;
+            height: 100%;
             overflow: hidden;
+            background-color: #000;
+        }
+
+        .rtbs-news-container {
+            width: 100%;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            border: 8px solid #ff5e14;
-            margin-bottom: 50px;
         }
 
-        /* 9:16 Image Box */
-        .feed-image-box {
-            flex: 4;
-            width: 100%;
+        /* நீல நிற பார்டர் மற்றும் 9:16 கட்டம் */
+        .news-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            border: 15px solid #ffde00; /* மஞ்சள் பார்டர் - உமது படத்தைப் போல */
             position: relative;
-            background: #111;
+            background: #fff;
         }
 
-        .feed-image-box img {
+        /* மேல் பகுதி - படம் (9:16 Ratio-க்கு ஏற்றவாறு) */
+        .news-image-area {
+            flex: 2;
+            overflow: hidden;
+            background: #000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .news-image-area img {
             width: 100%;
             height: 100%;
-            object-fit: cover; /* 9:16 விகிதத்தில் படத்தை கச்சிதமாக வைக்கும் */
+            object-fit: cover;
         }
 
-        /* Title & Content Box */
-        .feed-content {
+        /* கீழ் பகுதி - செய்திக் கட்டம் */
+        .news-text-area {
             flex: 1;
-            background: #fff;
-            padding: 40px;
+            background: #cc0000; /* சிவப்பு பின்னணி - உமது படத்தைப் போல */
+            padding: 40px 20px;
             display: flex;
-            flex-direction: column;
-            justify-content: center;
             align-items: center;
+            justify-content: center;
             text-align: center;
         }
 
-        .feed-title {
+        .news-title {
+            color: #ffffff;
             font-family: 'Poppins', sans-serif;
-            font-size: 52px; /* OBS-ல் தெரிய பெரிய அளவு */
-            font-weight: 800;
-            color: #1c2c52;
-            line-height: 1.2;
+            font-size: 45px;
+            font-weight: 900;
+            line-height: 1.3;
             margin: 0;
         }
 
-        .feed-meta {
-            margin-top: 15px;
-            font-size: 24px;
-            color: #ff5e14;
-            font-weight: 600;
-            text-transform: uppercase;
+        /* Footer Info */
+        .rtbs-footer {
+            background: #fff;
+            padding: 20px;
+            text-align: center;
+            border-top: 5px solid #ffde00;
         }
 
-        .preloader-custom {
-            text-align: center;
-            color: white;
-            font-size: 30px;
-            padding: 50px;
-        }
+        .rtbs-footer h4 { margin: 5px 0; color: #1c2c52; font-weight: 800; }
+        .rtbs-footer p { margin: 0; color: #ff5e14; font-weight: 600; }
     </style>
 </head>
 
 <body>
 
-    <div id="blogger-feed" class="obs-feed-container">
-        <div class="preloader-custom">Loading RTBS Live Feed...</div>
+    <div id="feed-target" class="rtbs-news-container">
+        <div style="color:white; text-align:center; padding-top:50%;">செய்திகள் ஏற்றப்படுகின்றன...</div>
     </div>
 
     <script src="assets/vendors/jquery/jquery-3.6.0.min.js"></script>
-
+    
     <script>
-        // உங்கள் Blogger URL-ஐ இங்கே மாற்றவும்
-        const BLOG_URL = "https://rss.rtbs.in"; 
-        const MAX_RESULTS = 3; // எத்தனை செய்திகள் காட்ட வேண்டும்?
+        // மாற்ற வேண்டியவை: உங்கள் பிளாக்கர் RSS URL
+        const BLOG_URL = "https://rss.rtbs.in/feeds/posts/default?alt=json";
 
-        async function fetchBloggerFeed() {
+        async function loadNews() {
             try {
-                // Blogger RSS Feed-ஐ JSON ஆக மாற்ற ஒரு API பயன்படுத்துகிறோம்
-                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${BLOG_URL}/feeds/posts/default?alt=rss&api_key=your_api_key_here`);
+                const response = await fetch(BLOG_URL);
                 const data = await response.json();
+                const entries = data.feed.entry;
 
-                let feedHTML = "";
+                // சமீபத்திய ஒரு செய்தியை மட்டும் காட்ட (OBS-க்கு சிறந்தது)
+                const latestPost = entries[0];
+                const title = latestPost.title.$t;
+                
+                // முதல் படத்தை எடுக்கும் முறை
+                let imgUrl = "";
+                if (latestPost.media$thumbnail) {
+                    imgUrl = latestPost.media$thumbnail.url.replace('s72-c', 's1600'); // உயர்தர படம்
+                } else {
+                    imgUrl = "assets/images/backgrounds/slider-1-1.jpg"; // படம் இல்லையென்றால் default
+                }
 
-                data.items.forEach((item, index) => {
-                    if (index < MAX_RESULTS) {
-                        // பிளாக்கர் பதிவில் இருந்து முதல் படத்தை மட்டும் பிரித்தெடுக்கிறோம்
-                        let imgUrl = item.thumbnail || item.enclosure.link;
-                        
-                        // ஒருவேளை thumbnail இல்லையென்றால் content-ல் இருந்து படத்தை தேடும் முறை
-                        if(!imgUrl) {
-                             const content = item.content;
-                             const imgMatch = content.match(/<img[^>]+src="([^">]+)"/);
-                             imgUrl = imgMatch ? imgMatch[1] : 'assets/images/resources/logo-1.png';
-                        }
+                const html = `
+                    <div class="news-item">
+                        <div class="news-image-area">
+                            <img src="${imgUrl}" alt="News Image">
+                        </div>
+                        <div class="news-text-area">
+                            <h2 class="news-title">${title}</h2>
+                        </div>
+                        <div class="rtbs-footer">
+                            <h4>RTBS Web 3.0</h4>
+                            <p>+91 72000 81010</p>
+                        </div>
+                    </div>
+                `;
 
-                        feedHTML += `
-                            <div class="feed-item wow fadeInUp" data-wow-delay="${index * 200}ms">
-                                <div class="feed-image-box">
-                                    <img src="${imgUrl}" alt="Blogger Image">
-                                </div>
-                                <div class="feed-content">
-                                    <h2 class="feed-title">${item.title}</h2>
-                                    <div class="feed-meta">RTBS NEWS UPDATES</div>
-                                </div>
-                            </div>
-                        `;
-                    }
-                });
-
-                document.getElementById('blogger-feed').innerHTML = feedHTML;
-            } catch (error) {
-                console.error("Feed Error:", error);
-                document.getElementById('blogger-feed').innerHTML = "<h1 style='color:white;'>Error Loading Feed</h1>";
+                document.getElementById('feed-target').innerHTML = html;
+            } catch (e) {
+                console.error("Error:", e);
+                document.getElementById('feed-target').innerHTML = "<h1 style='color:white;'>Check Blog URL / Internet</h1>";
             }
         }
 
-        // பக்கத்தை திறந்தவுடன் Feed-ஐ இயக்கும்
-        window.onload = fetchBloggerFeed;
+        loadNews();
+        // 5 நிமிடத்திற்கு ஒருமுறை தானாக புதுப்பிக்க
+        setInterval(loadNews, 300000);
     </script>
-
 </body>
 </html>

@@ -4,152 +4,137 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title> RTBS || Live Blogger News </title>
-    <link rel="apple-touch-icon" sizes="180x180" href="assets/images/favicons/apple-touch-icon.png" />
-    <link rel="icon" type="image/png" sizes="32x32" href="assets/images/favicons/favicon-32x32.png" />
-    <link rel="icon" type="image/png" sizes="16x16" href="assets/images/favicons/favicon-16x16.png" />
-    <link rel="manifest" href="assets/images/favicons/site.webmanifest" />
-
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;400;700;900&display=swap" rel="stylesheet">
-
+    <title>RTBS || MOOT LIVE Feed</title>
+    
     <link rel="stylesheet" href="assets/vendors/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/vendors/fontawesome/css/all.min.css" />
     <link rel="stylesheet" href="assets/css/slider-style.css" />
     <link rel="stylesheet" href="assets/css/style-responsive.css" />
 
     <style>
-        /* 9:16 OBS Full Screen Layout */
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            overflow: hidden;
-            background-color: #000;
-        }
-
-        .rtbs-news-container {
-            width: 100%;
+        body, html { margin: 0; padding: 0; height: 100%; overflow: hidden; background: #000; }
+        
+        /* 9:16 Frame with Yellow Border */
+        .moot-live-frame {
+            width: 100vw;
             height: 100vh;
+            border: 12px solid #FFD700; /* படத்தில் உள்ள மஞ்சள் பார்டர் */
             display: flex;
             flex-direction: column;
-        }
-
-        /* நீல நிற பார்டர் மற்றும் 9:16 கட்டம் */
-        .news-item {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            border: 15px solid #ffde00; /* மஞ்சள் பார்டர் - உமது படத்தைப் போல */
             position: relative;
-            background: #fff;
-        }
-
-        /* மேல் பகுதி - படம் (9:16 Ratio-க்கு ஏற்றவாறு) */
-        .news-image-area {
-            flex: 2;
-            overflow: hidden;
+            box-sizing: border-box;
             background: #000;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
-        .news-image-area img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+        /* Top Image Section */
+        .visual-area {
+            flex: 1.2;
+            overflow: hidden;
+            position: relative;
+        }
+        .visual-area img { width: 100%; height: 100%; object-fit: cover; }
+
+        /* MOOT LIVE Overlay */
+        .logo-overlay {
+            position: absolute;
+            bottom: 10px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 10;
         }
 
-        /* கீழ் பகுதி - செய்திக் கட்டம் */
-        .news-text-area {
-            flex: 1;
-            background: #cc0000; /* சிவப்பு பின்னணி - உமது படத்தைப் போல */
-            padding: 40px 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Red News Box (படத்தில் உள்ளது போல) */
+        .news-box {
+            background: #CC0000;
+            padding: 30px 20px;
+            margin: 0 10px;
+            border-radius: 15px;
+            border: 3px solid #FFD700;
             text-align: center;
+            position: relative;
+            top: -20px;
+            z-index: 5;
         }
-
         .news-title {
-            color: #ffffff;
+            color: #fff;
             font-family: 'Poppins', sans-serif;
-            font-size: 45px;
-            font-weight: 900;
+            font-size: 38px;
+            font-weight: 800;
             line-height: 1.3;
             margin: 0;
         }
 
-        /* Footer Info */
-        .rtbs-footer {
-            background: #fff;
+        /* Bottom Info Section */
+        .bottom-info {
+            flex: 0.8;
+            background: url('assets/images/backgrounds/slider-1-1.jpg') no-repeat center center;
+            background-size: cover;
             padding: 20px;
-            text-align: center;
-            border-top: 5px solid #ffde00;
+            color: #fff;
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
-
-        .rtbs-footer h4 { margin: 5px 0; color: #1c2c52; font-weight: 800; }
-        .rtbs-footer p { margin: 0; color: #ff5e14; font-weight: 600; }
+        .contact-pill {
+            background: #E61E25;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: inline-block;
+            width: fit-content;
+            font-weight: bold;
+            font-size: 24px;
+        }
     </style>
 </head>
 
 <body>
 
-    <div id="feed-target" class="rtbs-news-container">
-        <div style="color:white; text-align:center; padding-top:50%;">செய்திகள் ஏற்றப்படுகின்றன...</div>
-    </div>
+    <div class="moot-live-frame" id="dynamic-content">
+        </div>
 
     <script src="assets/vendors/jquery/jquery-3.6.0.min.js"></script>
-    
     <script>
-        // மாற்ற வேண்டியவை: உங்கள் பிளாக்கர் RSS URL
+        // உங்கள் பிளாக்கர் தளம்
         const BLOG_URL = "https://rss.rtbs.in/feeds/posts/default?alt=json";
 
-        async function loadNews() {
+        async function fetchMootFeed() {
             try {
                 const response = await fetch(BLOG_URL);
                 const data = await response.json();
-                const entries = data.feed.entry;
+                const post = data.feed.entry[0];
 
-                // சமீபத்திய ஒரு செய்தியை மட்டும் காட்ட (OBS-க்கு சிறந்தது)
-                const latestPost = entries[0];
-                const title = latestPost.title.$t;
-                
-                // முதல் படத்தை எடுக்கும் முறை
-                let imgUrl = "";
-                if (latestPost.media$thumbnail) {
-                    imgUrl = latestPost.media$thumbnail.url.replace('s72-c', 's1600'); // உயர்தர படம்
-                } else {
-                    imgUrl = "assets/images/backgrounds/slider-1-1.jpg"; // படம் இல்லையென்றால் default
-                }
+                const title = post.title.$t;
+                let imgUrl = post.media$thumbnail ? post.media$thumbnail.url.replace('s72-c', 's1600') : 'assets/images/resources/logo-1.png';
 
                 const html = `
-                    <div class="news-item">
-                        <div class="news-image-area">
-                            <img src="${imgUrl}" alt="News Image">
-                        </div>
-                        <div class="news-text-area">
-                            <h2 class="news-title">${title}</h2>
-                        </div>
-                        <div class="rtbs-footer">
-                            <h4>RTBS Web 3.0</h4>
-                            <p>+91 72000 81010</p>
+                    <div class="visual-area">
+                        <img src="${imgUrl}" alt="Live Image">
+                        <div class="logo-overlay">
+                            <img src="assets/images/resources/logo-1.png" style="width: 180px; height: auto;">
                         </div>
                     </div>
-                `;
+                    
+                    <div class="news-box">
+                        <h2 class="news-title">${title}</h2>
+                    </div>
 
-                document.getElementById('feed-target').innerHTML = html;
-            } catch (e) {
-                console.error("Error:", e);
-                document.getElementById('feed-target').innerHTML = "<h1 style='color:white;'>Check Blog URL / Internet</h1>";
+                    <div class="bottom-info">
+                        <p style="font-size: 22px; margin-bottom: 5px;">Secure Peer-to-Peer Audio Video Transmission</p>
+                        <h1 style="font-weight: 900; margin: 0;">RTBS Web 3.0</h1>
+                        <p style="font-size: 20px;">The Real Time Broadcasting Solution</p>
+                        <br>
+                        <div class="contact-pill">+91 72000 81010 📞</div>
+                    </div>
+                `;
+                document.getElementById('dynamic-content').innerHTML = html;
+            } catch (err) {
+                document.getElementById('dynamic-content').innerHTML = `<h1 style="color:white; text-align:center;">Check Internet / Blog Feed</h1>`;
             }
         }
 
-        loadNews();
-        // 5 நிமிடத்திற்கு ஒருமுறை தானாக புதுப்பிக்க
-        setInterval(loadNews, 300000);
+        fetchMootFeed();
+        setInterval(fetchMootFeed, 60000); // ஒவ்வொரு நிமிடமும் புதுப்பிக்கும்
     </script>
 </body>
 </html>

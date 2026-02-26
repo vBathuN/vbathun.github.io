@@ -20,10 +20,10 @@
             font-weight: bold; font-display: swap; 
         }
 
-        /* லோகோவை பெட்டிக்கு வெளியே மேலே மட்டும் வைக்கப்பட்டது */
+        /* லோகோ செய்திப் பெட்டிக்கு வெளியே அதன் மேலே அமர */
         .logo-fixed {
             position: absolute;
-            bottom: 100%; /* பெட்டியின் விளிம்பிற்கு வெளியே */
+            bottom: 100%; /* பெட்டியின் மேல் விளிம்பிற்கு வெளியே */
             left: 50%;
             transform: translateX(-50%);
             margin-bottom: 5px; /* பெட்டிக்கும் லோகோவுக்கும் இடைவெளி */
@@ -83,10 +83,10 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            position: relative; /* லோகோ இதை சார்ந்து அமைய */
+            position: relative; /* லோகோவை இதைப் பின்பற்றி அமைய */
         }
 
-        /* தலைப்புகளுக்குச் சட்டவியல் ஃபான்ட் மாற்றம் [cite: 2026-02-24] */
+        /* தலைப்புகளுக்குச் சட்டவியல் ஃபான்ட் மாற்றம் */
         .headline {
             color: #fff;
             font-size: 36px;
@@ -116,7 +116,7 @@
 
         async function initSyncSlider() {
             try {
-                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
+                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await response.json();
 
                 if (data.status === 'ok') {
@@ -138,21 +138,23 @@
                             </div>`;
                     });
 
-                    // உங்கள் ஒரிஜினல் ஸ்லைடர் செட்டிங்ஸ்
-                    $('#image-slider').html(imgHtml).owlCarousel({
+                    $('#image-slider').html(imgHtml);
+                    $('#title-slider').html(titleHtml);
+
+                    const $imgSlider = $('#image-slider').owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'slideOutDown', animateIn: 'fadeIn',
                         autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000,
                         mouseDrag: false, touchDrag: false
                     });
 
-                    const $titleSlider = $('#title-slider').html(titleHtml).owlCarousel({
+                    const $titleSlider = $('#title-slider').owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'fadeOut', animateIn: 'fadeInRight', 
                         smartSpeed: 1000, mouseDrag: false, touchDrag: false
                     });
 
-                    $('#image-slider').on('translate.owl.carousel', function(event) {
+                    $imgSlider.on('translate.owl.carousel', function(event) {
                         $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
                     });
                 }

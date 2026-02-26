@@ -22,7 +22,7 @@
 
         .logo-fixed {
             position: absolute;
-            bottom: 160px; /* செய்தி பெட்டிக்கு மேல் */
+            bottom: 160px; 
             left: 50%;
             transform: translateX(-50%);
             z-index: 2000;
@@ -60,14 +60,11 @@
 
         /* 2. Layout & Sync Sliders */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
-        
         .main-container { width: 100vw; height: 100vh; position: relative; border: 15px solid #FFD700; box-sizing: border-box; }
 
-        /* Image Slider */
         #image-slider { height: 100vh; z-index: 1; }
         .slide-img { width: 100%; height: 100vh; object-fit: fill; }
 
-        /* Title Slider (Red Box) */
         #title-slider {
             position: absolute;
             bottom: 40px;
@@ -95,7 +92,6 @@
             line-height: 1.3;
         }
 
-        /* Owl Effects */
         .owl-carousel .owl-item { height: 100%; }
     </style>
 </head>
@@ -109,7 +105,6 @@
         </div>
 
         <div id="image-slider" class="owl-carousel owl-theme"></div>
-
         <div id="title-slider" class="owl-carousel owl-theme"></div>
     </div>
 
@@ -117,13 +112,12 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // jmain Label மட்டும் வரவைக்க
-        const LABEL_NAME = "jmain";
-        const BLOG_RSS = `https://rss.rtbs.in/feeds/posts/default/-/${encodeURIComponent(LABEL_NAME)}?alt=rss`;
+        // jmain Label-ஐ மட்டும் காட்டும் RSS URL
+        const BLOG_RSS = "https://rss.rtbs.in/feeds/posts/default/-/jmain?alt=rss";
 
         async function initSyncSlider() {
             try {
-                // rss2json மூலம் தரவுகளை இழுத்தல்
+                // தரவுகளை இழுத்தல்
                 const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}&api_key=oynly0429s8a1v5m0z0it7l239tov806733t6aix`);
                 const data = await response.json();
 
@@ -144,33 +138,31 @@
                             </div>`;
                     });
 
-                    const $imgSlider = $('#image-slider').html(imgHtml);
-                    const $titleSlider = $('#title-slider').html(titleHtml);
+                    // தரவுகளைச் சேர்த்த பிறகு ஸ்லைடரைத் தொடங்குதல்
+                    $('#image-slider').html(imgHtml);
+                    $('#title-slider').html(titleHtml);
 
-                    // Image Slider Initialization
-                    $imgSlider.owlCarousel({
+                    const owlImg = $('#image-slider').owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'slideOutDown', animateIn: 'fadeIn',
-                        autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000,
-                        mouseDrag: false, touchDrag: false
+                        autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000
                     });
 
-                    // Title Slider Initialization
-                    $titleSlider.owlCarousel({
+                    const owlTitle = $('#title-slider').owlCarousel({
                         loop: true, items: 1, dots: false, nav: false,
                         animateOut: 'fadeOut', animateIn: 'fadeInRight',
-                        smartSpeed: 1000, mouseDrag: false, touchDrag: false
+                        smartSpeed: 1000
                     });
 
-                    // Syncing Title with Image Slider
-                    $imgSlider.on('changed.owl.carousel', function(event) {
-                        let index = event.item.index - event.relatedTarget._clones.length / 2;
-                        let count = event.item.count;
+                    // Syncing
+                    owlImg.on('changed.owl.carousel', function(e) {
+                        let index = e.item.index - e.relatedTarget._clones.length / 2;
+                        let count = e.item.count;
                         let realIndex = (index % count + count) % count;
-                        $titleSlider.trigger('to.owl.carousel', [realIndex, 1000]);
+                        owlTitle.trigger('to.owl.carousel', [realIndex, 1000]);
                     });
                 }
-            } catch (err) { console.error("Error fetching feed:", err); }
+            } catch (err) { console.error(err); }
         }
 
         $(document).ready(initSyncSlider);

@@ -133,6 +133,7 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
+        // இங்கே உங்கள் புதிய RSS லிங்கை கொடுக்கவும்
         const BLOG_RSS = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=rss";
 
         async function initSyncSlider() {
@@ -145,8 +146,13 @@
                     let titleHtml = "";
 
                     data.items.forEach(item => {
-                        let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
-                        imgHtml += `<div class="item"><img src="${img}" class="slide-img"></div>`;
+                        // பிழை வராமல் தடுப்பதற்கான புதிய பாதுகாப்பான கோடு
+                        let rawImg = item.thumbnail || (item.enclosure && item.enclosure.link) || "";
+                        
+                        // படம் இருந்தால் அளவை மாற்றும், இல்லையென்றால் ஒரு கறுப்பு நிற டீஃபால்ட் படம் வரும்
+                        let finalImg = rawImg ? rawImg.replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600') : "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
+
+                        imgHtml += `<div class="item"><img src="${finalImg}" class="slide-img"></div>`;
                         
                         if(item.title && item.title.trim() !== "") {
                             titleHtml += `
@@ -177,7 +183,7 @@
                         $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
                     });
                 }
-            } catch (err) { console.error(err); }
+            } catch (err) { console.error("Slider Error: ", err); }
         }
 
         $(document).ready(initSyncSlider);

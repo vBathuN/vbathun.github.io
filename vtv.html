@@ -89,7 +89,6 @@
             z-index: 1500;
         }
 
-        /* சிவப்பு பெட்டி - தரவு இருந்தால் மட்டுமே காட்டப்படும் */
         .red-news-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 30px 20px;
@@ -97,14 +96,9 @@
             border-radius: 20px;
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
-            position: relative; 
-            display: none; /* ஆரம்பத்தில் மறைத்து வைக்கப்பட்டுள்ளது */
-        }
-
-        /* தலைப்பில் எழுத்து இருந்தால் பெட்டியை காட்டு */
-        .headline:not(:empty) + .red-news-box, 
-        .red-news-box:has(.headline:not(:empty)) {
-            display: block;
+            position: relative;
+            /* எழுத்துக்கள் இல்லையென்றால் நிழல் தெரியாமல் இருக்க மறைக்கப்பட்டுள்ளது */
+            display: none; 
         }
 
         .headline {
@@ -113,7 +107,7 @@
             font-weight: 900;
             font-family: 'Tamil039', 'Poppins', sans-serif;
             margin: 0;
-            line-height: 1.4; /* ஒரு நூல் கூட்டப்பட்டுள்ளது */
+            line-height: 1.5; /* Line height 3px அளவுக்கு (0.1 ratio) கூட்டப்பட்டுள்ளது */
             letter-spacing: 1px;
             padding-top: 10px;
         }
@@ -152,7 +146,7 @@
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
                         imgHtml += `<div class="item"><img src="${img}" class="slide-img"></div>`;
                         
-                        // தலைப்பு இருந்தால் மட்டுமே பெட்டி உருவாவதற்கான தரவு
+                        // தலைப்பு இருந்தால் மட்டுமே பெட்டி (Box + Shadow) உருவாகும்
                         if(item.title && item.title.trim() !== "") {
                             titleHtml += `
                                 <div class="item">
@@ -188,5 +182,4 @@
         $(document).ready(initSyncSlider);
     </script>
 </body>
-
 </html>

@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="assets/css/slider-style.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ - 25% அதிகரிக்கப்பட்டது */
+        /* 1. சட்டவியல் லோகோ */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
@@ -34,12 +34,12 @@
         .text-box {
             background: #c60203; padding: 0px 10px 0px 15px; 
             border-radius: 12px 0 0 12px; border-top: 1px solid #ff4d4d;
-            display: flex; align-items: center; height: 69px; /* Increased 25% from 55px */
+            display: flex; align-items: center; height: 69px; 
             position: relative; overflow: hidden; 
         }
 
         .text-box span {
-            display: inline-block; font-size: 48px; /* Increased 25% from 38px */
+            display: inline-block; font-size: 48px; 
             font-weight: 900;
             padding-top: 32px; letter-spacing: 5px; font-family: 'Tamil039';
             background: linear-gradient(110deg, #ffffff 35%, #bfbfbf 45%, #ffffff 50%, #bfbfbf 55%, #ffffff 65%);
@@ -51,7 +51,7 @@
 
         .icon-box {
             background: linear-gradient(180deg, #0055ff 0%, #002db3 100%);
-            width: 69px; height: 69px; /* Increased 25% from 55px */
+            width: 69px; height: 69px; 
             display: flex; justify-content: center;
             align-items: center; border-radius: 0 12px 12px 0; border-top: 1px solid #6699ff;
         }
@@ -64,7 +64,6 @@
         /* 2. Layout & Sync Sliders */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
         
-        /* பார்டர் 10px ஆக குறைக்கப்பட்டுள்ளது */
         .main-container { 
             width: 100vw; 
             height: 100vh; 
@@ -75,7 +74,6 @@
 
         #image-slider { height: 100%; z-index: 1; }
         
-        /* படங்கள் இடைவெளியின்றி நிரப்ப object-fit: cover மற்றும் height மாற்றம் */
         .slide-img { 
             width: 100%; 
             height: calc(100vh - 20px); 
@@ -91,6 +89,7 @@
             z-index: 1500;
         }
 
+        /* சிவப்பு பெட்டி - தரவு இருந்தால் மட்டுமே காட்டப்படும் */
         .red-news-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 30px 20px;
@@ -99,6 +98,13 @@
             text-align: center;
             box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             position: relative; 
+            display: none; /* ஆரம்பத்தில் மறைத்து வைக்கப்பட்டுள்ளது */
+        }
+
+        /* தலைப்பில் எழுத்து இருந்தால் பெட்டியை காட்டு */
+        .headline:not(:empty) + .red-news-box, 
+        .red-news-box:has(.headline:not(:empty)) {
+            display: block;
         }
 
         .headline {
@@ -107,7 +113,7 @@
             font-weight: 900;
             font-family: 'Tamil039', 'Poppins', sans-serif;
             margin: 0;
-            line-height: 1.3;
+            line-height: 1.4; /* ஒரு நூல் கூட்டப்பட்டுள்ளது */
             letter-spacing: 1px;
             padding-top: 10px;
         }
@@ -145,12 +151,18 @@
                     data.items.forEach(item => {
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
                         imgHtml += `<div class="item"><img src="${img}" class="slide-img"></div>`;
-                        titleHtml += `
-                            <div class="item">
-                                <div class="red-news-box">
-                                    <h2 class="headline">${item.title}</h2>
-                                </div>
-                            </div>`;
+                        
+                        // தலைப்பு இருந்தால் மட்டுமே பெட்டி உருவாவதற்கான தரவு
+                        if(item.title && item.title.trim() !== "") {
+                            titleHtml += `
+                                <div class="item">
+                                    <div class="red-news-box" style="display:block;">
+                                        <h2 class="headline">${item.title}</h2>
+                                    </div>
+                                </div>`;
+                        } else {
+                            titleHtml += `<div class="item"></div>`;
+                        }
                     });
 
                     $('#image-slider').html(imgHtml).owlCarousel({

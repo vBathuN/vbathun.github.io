@@ -4,16 +4,15 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>RTBS || சட்டவியல் Sync Slider</title>
+    <title>LawTamil || Law Shorts Sync Slider</title>
     
     <link rel="stylesheet" href="assets/vendors/bootstrap/css/bootstrap.min.css" />
     <link rel="stylesheet" href="assets/vendors/animate/animate.min.css" />
     <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.carousel.min.css" />
     <link rel="stylesheet" href="assets/vendors/owl-carousel/owl.theme.default.min.css" />
-    <link rel="stylesheet" href="assets/css/slider-style.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ */
+        /* 1. சட்டவியல் லோகோ வடிவமைப்பு */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
@@ -25,7 +24,6 @@
             bottom: 90%; 
             left: 50%;
             transform: translateX(-50%);
-            margin-bottom: 5px; 
             z-index: 2000;
             display: flex;
             align-items: center;
@@ -61,7 +59,7 @@
         @keyframes shineMove { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
         @keyframes flipScale { 0%, 85% { transform: rotateY(0deg); } 90% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
 
-        /* 2. Layout & Sync Sliders */
+        /* 2. Slider Layout */
         body, html { margin: 0; padding: 0; height: 100%; width: 100%; overflow: hidden; background: #000; }
         
         .main-container { 
@@ -89,6 +87,7 @@
             z-index: 1500;
         }
 
+        /* செய்திப் பெட்டி வடிவமைப்பு */
         .red-news-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 30px 20px;
@@ -106,9 +105,9 @@
             font-weight: 900;
             font-family: 'Tamil039', 'Poppins', sans-serif;
             margin: 0;
-            line-height: 1.7; 
+            line-height: 2; /* நீங்கள் கேட்டபடி Line height 2 */
             letter-spacing: 1px;
-            word-spacing: -10px;
+            word-spacing: -5px;
             padding-top: 10px;
             text-shadow: 2px 2px 10px rgba(0,0,0,0.8); 
         }
@@ -128,17 +127,17 @@
         <div class="icon-box"><span>⚖️</span></div>
     </div>
 
-    <script src="assets/vendors/jquery/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // JSONP முறையைப் பயன்படுத்துகிறோம் (CORS மற்றும் Cache பிரச்சனை வராமல் இருக்க)
+        // RSS தடையைத் தவிர்க்க jsonp முறையைப் பயன்படுத்துகிறோம்
         const BLOG_JSONP = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=json-in-script";
 
         function initSyncSlider() {
             $.ajax({
                 url: BLOG_JSONP,
-                dataType: "jsonp", // இது CORS தடையை உடைக்கும்
+                dataType: "jsonp",
                 success: function(data) {
                     if (data.feed && data.feed.entry) {
                         let imgHtml = "";
@@ -147,17 +146,15 @@
                         data.feed.entry.forEach(item => {
                             let title = item.title.$t || "";
                             
-                            // 1. Thumbnail உள்ளதா எனப் பார்த்தல்
+                            // படத்தைக் கண்டறிதல்
                             let rawImg = item.media$thumbnail ? item.media$thumbnail.url : "";
-                            
-                            // 2. இல்லையென்றால் Content-ல் உள்ள முதல் படத்தை எடுத்தல்
                             if (!rawImg && item.content && item.content.$t) {
                                 let imgMatch = item.content.$t.match(/<img[^>]+src="([^">]+)"/);
                                 if (imgMatch) rawImg = imgMatch[1];
                             }
 
-                            // 3. படத்தைத் தரமான அளவிற்க்கு (s1600) மாற்றுதல்
-                            let finalImg = "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
+                            // தரமான படமாக மாற்றுதல்
+                            let finalImg = "https://via.placeholder.com/1080x1920/000000/111111?text=Image+Loading...";
                             if (rawImg) {
                                 finalImg = rawImg.replace(/\/s\d+(\-c)?\//, '/s1600/').replace(/\/w\d+\-h\d+\-[^\/]+\//, '/s1600/');
                             }
@@ -176,6 +173,7 @@
                             }
                         });
 
+                        // Sliders இனிஷியலைசேஷன்
                         $('#image-slider').html(imgHtml).owlCarousel({
                             loop: true, items: 1, dots: false, nav: false,
                             animateOut: 'slideOutDown', animateIn: 'fadeIn',
@@ -189,15 +187,11 @@
                             smartSpeed: 1000, mouseDrag: false, touchDrag: false
                         });
 
+                        // இரண்டு ஸ்லைடர்களையும் இணைத்தல் (Sync)
                         $('#image-slider').on('translate.owl.carousel', function(event) {
                             $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
                         });
-                    } else {
-                        console.warn("இந்த லேபிளில் பதிவுகள் இல்லை.");
                     }
-                },
-                error: function(err) {
-                    console.error("Slider Fetch Error: ", err);
                 }
             });
         }

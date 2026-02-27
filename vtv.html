@@ -132,67 +132,74 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // மூன்றாம் தரப்பு API தவிர்க்கப்பட்டு, Blogger-இன் நேரடி JSON பயன்படுத்தப்பட்டுள்ளது
-        const BLOG_JSON = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=json";
+        // JSONP முறையைப் பயன்படுத்துகிறோம் (CORS மற்றும் Cache பிரச்சனை வராமல் இருக்க)
+        const BLOG_JSONP = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=json-in-script";
 
-        async function initSyncSlider() {
-            try {
-                const response = await fetch(BLOG_JSON);
-                const data = await response.json();
+        function initSyncSlider() {
+            $.ajax({
+                url: BLOG_JSONP,
+                dataType: "jsonp", // இது CORS தடையை உடைக்கும்
+                success: function(data) {
+                    if (data.feed && data.feed.entry) {
+                        let imgHtml = "";
+                        let titleHtml = "";
 
-                if (data.feed && data.feed.entry) {
-                    let imgHtml = "";
-                    let titleHtml = "";
+                        data.feed.entry.forEach(item => {
+                            let title = item.title.$t || "";
+                            
+                            // 1. Thumbnail உள்ளதா எனப் பார்த்தல்
+                            let rawImg = item.media$thumbnail ? item.media$thumbnail.url : "";
+                            
+                            // 2. இல்லையென்றால் Content-ல் உள்ள முதல் படத்தை எடுத்தல்
+                            if (!rawImg && item.content && item.content.$t) {
+                                let imgMatch = item.content.$t.match(/<img[^>]+src="([^">]+)"/);
+                                if (imgMatch) rawImg = imgMatch[1];
+                            }
 
-                    data.feed.entry.forEach(item => {
-                        let title = item.title.$t || "";
-                        
-                        // 1. Thumbnail உள்ளதா எனப் பார்த்தல்
-                        let rawImg = item.media$thumbnail ? item.media$thumbnail.url : "";
-                        
-                        // 2. இல்லையென்றால் Content-ல் உள்ள முதல் படத்தை எடுத்தல்
-                        if (!rawImg && item.content && item.content.$t) {
-                            let imgMatch = item.content.$t.match(/<img[^>]+src="([^">]+)"/);
-                            if (imgMatch) rawImg = imgMatch[1];
-                        }
+                            // 3. படத்தைத் தரமான அளவிற்க்கு (s1600) மாற்றுதல்
+                            let finalImg = "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
+                            if (rawImg) {
+                                finalImg = rawImg.replace(/\/s\d+(\-c)?\//, '/s1600/').replace(/\/w\d+\-h\d+\-[^\/]+\//, '/s1600/');
+                            }
 
-                        // 3. படத்தைத் தரமான அளவிற்க்கு (s1600) மாற்றுதல்
-                        let finalImg = rawImg ? rawImg.replace(/\/s\d+(\-c)?\//, '/s1600/') : "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
+                            imgHtml += `<div class="item"><img src="${finalImg}" class="slide-img"></div>`;
+                            
+                            if (title.trim() !== "") {
+                                titleHtml += `
+                                    <div class="item">
+                                        <div class="red-news-box" style="display:block;">
+                                            <h2 class="headline">${title}</h2>
+                                        </div>
+                                    </div>`;
+                            } else {
+                                titleHtml += `<div class="item"></div>`;
+                            }
+                        });
 
-                        imgHtml += `<div class="item"><img src="${finalImg}" class="slide-img"></div>`;
-                        
-                        if (title.trim() !== "") {
-                            titleHtml += `
-                                <div class="item">
-                                    <div class="red-news-box" style="display:block;">
-                                        <h2 class="headline">${title}</h2>
-                                    </div>
-                                </div>`;
-                        } else {
-                            titleHtml += `<div class="item"></div>`;
-                        }
-                    });
+                        $('#image-slider').html(imgHtml).owlCarousel({
+                            loop: true, items: 1, dots: false, nav: false,
+                            animateOut: 'slideOutDown', animateIn: 'fadeIn',
+                            autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000,
+                            mouseDrag: false, touchDrag: false
+                        });
 
-                    $('#image-slider').html(imgHtml).owlCarousel({
-                        loop: true, items: 1, dots: false, nav: false,
-                        animateOut: 'slideOutDown', animateIn: 'fadeIn',
-                        autoplay: true, autoplayTimeout: 8000, smartSpeed: 1000,
-                        mouseDrag: false, touchDrag: false
-                    });
+                        const $titleSlider = $('#title-slider').html(titleHtml).owlCarousel({
+                            loop: true, items: 1, dots: false, nav: false,
+                            animateOut: 'fadeOut', animateIn: 'fadeInRight', 
+                            smartSpeed: 1000, mouseDrag: false, touchDrag: false
+                        });
 
-                    const $titleSlider = $('#title-slider').html(titleHtml).owlCarousel({
-                        loop: true, items: 1, dots: false, nav: false,
-                        animateOut: 'fadeOut', animateIn: 'fadeInRight', 
-                        smartSpeed: 1000, mouseDrag: false, touchDrag: false
-                    });
-
-                    $('#image-slider').on('translate.owl.carousel', function(event) {
-                        $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
-                    });
-                } else {
-                    console.warn("No posts found for this label.");
+                        $('#image-slider').on('translate.owl.carousel', function(event) {
+                            $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
+                        });
+                    } else {
+                        console.warn("இந்த லேபிளில் பதிவுகள் இல்லை.");
+                    }
+                },
+                error: function(err) {
+                    console.error("Slider Fetch Error: ", err);
                 }
-            } catch (err) { console.error("Slider Error: ", err); }
+            });
         }
 
         $(document).ready(initSyncSlider);

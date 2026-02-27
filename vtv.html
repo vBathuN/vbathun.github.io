@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="assets/css/slider-style.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ */
+        /* 1. சட்டவியல் லோகோ - மீண்டும் 25% பெரிதாக்கப்பட்டது */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
@@ -32,31 +32,31 @@
         }
 
         .text-box {
-            background: #c60203; padding: 0px 10px 0px 15px; 
-            border-radius: 12px 0 0 12px; border-top: 1px solid #ff4d4d;
-            display: flex; align-items: center; height: 69px; 
+            background: #c60203; padding: 0px 12px 0px 18px; 
+            border-radius: 15px 0 0 15px; border-top: 1px solid #ff4d4d;
+            display: flex; align-items: center; height: 86px; /* Increased 25% more */
             position: relative; overflow: hidden; 
         }
 
         .text-box span {
-            display: inline-block; font-size: 48px; 
+            display: inline-block; font-size: 60px; /* Increased 25% more */
             font-weight: 900;
-            padding-top: 32px; letter-spacing: 5px; font-family: 'Tamil039';
+            padding-top: 40px; letter-spacing: 6px; font-family: 'Tamil039';
             background: linear-gradient(110deg, #ffffff 35%, #bfbfbf 45%, #ffffff 50%, #bfbfbf 55%, #ffffff 65%);
             background-size: 200% auto; -webkit-background-clip: text;
             background-clip: text; -webkit-text-fill-color: transparent;
-            -webkit-text-stroke: 0.6px #fff; animation: shineMove 3.5s linear infinite; 
-            line-height: 69px; z-index: 2; position: relative;
+            -webkit-text-stroke: 0.8px #fff; animation: shineMove 3.5s linear infinite; 
+            line-height: 86px; z-index: 2; position: relative;
         }
 
         .icon-box {
             background: linear-gradient(180deg, #0055ff 0%, #002db3 100%);
-            width: 69px; height: 69px; 
+            width: 86px; height: 86px; 
             display: flex; justify-content: center;
-            align-items: center; border-radius: 0 12px 12px 0; border-top: 1px solid #6699ff;
+            align-items: center; border-radius: 0 15px 15px 0; border-top: 1px solid #6699ff;
         }
 
-        .icon-box span { font-size: 48px; padding-top: 10px; animation: flipScale 6s infinite; }
+        .icon-box span { font-size: 60px; padding-top: 12px; animation: flipScale 6s infinite; }
 
         @keyframes shineMove { 0% { background-position: 200% center; } 100% { background-position: -200% center; } }
         @keyframes flipScale { 0%, 85% { transform: rotateY(0deg); } 90% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
@@ -89,16 +89,16 @@
             z-index: 1500;
         }
 
+        /* பெட்டி நிழல் முழுமையாக நீக்கப்பட்டுள்ளது */
         .red-news-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 30px 20px;
             border: 4px solid #FFD700;
             border-radius: 20px;
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.7);
             position: relative;
-            /* எழுத்துக்கள் இல்லையென்றால் நிழல் தெரியாமல் இருக்க மறைக்கப்பட்டுள்ளது */
             display: none; 
+            box-shadow: none; /* Shadow removed to fix your issue */
         }
 
         .headline {
@@ -107,9 +107,10 @@
             font-weight: 900;
             font-family: 'Tamil039', 'Poppins', sans-serif;
             margin: 0;
-            line-height: 1.5; /* Line height 3px அளவுக்கு (0.1 ratio) கூட்டப்பட்டுள்ளது */
+            line-height: 2; /* Increased to 2 as requested */
             letter-spacing: 1px;
             padding-top: 10px;
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8); /* Text-only shadow */
         }
 
         .owl-carousel .owl-item { height: 100%; }
@@ -146,7 +147,6 @@
                         let img = (item.thumbnail || item.enclosure.link).replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600');
                         imgHtml += `<div class="item"><img src="${img}" class="slide-img"></div>`;
                         
-                        // தலைப்பு இருந்தால் மட்டுமே பெட்டி (Box + Shadow) உருவாகும்
                         if(item.title && item.title.trim() !== "") {
                             titleHtml += `
                                 <div class="item">

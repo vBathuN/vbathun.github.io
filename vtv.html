@@ -13,7 +13,7 @@
     <link rel="stylesheet" href="assets/css/slider-style.css" />
 
     <style>
-        /* 1. சட்டவியல் லோகோ - மீண்டும் 25% பெரிதாக்கப்பட்டது */
+        /* 1. சட்டவியல் லோகோ */
         @font-face {
             font-family: 'Tamil039';
             src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
@@ -34,12 +34,12 @@
         .text-box {
             background: #c60203; padding: 0px 12px 0px 18px; 
             border-radius: 15px 0 0 15px; border-top: 1px solid #ff4d4d;
-            display: flex; align-items: center; height: 86px; /* Increased 25% more */
+            display: flex; align-items: center; height: 86px; 
             position: relative; overflow: hidden; 
         }
 
         .text-box span {
-            display: inline-block; font-size: 60px; /* Increased 25% more */
+            display: inline-block; font-size: 60px; 
             font-weight: 900;
             padding-top: 40px; letter-spacing: 6px; font-family: 'Tamil039';
             background: linear-gradient(110deg, #ffffff 35%, #bfbfbf 45%, #ffffff 50%, #bfbfbf 55%, #ffffff 65%);
@@ -89,7 +89,6 @@
             z-index: 1500;
         }
 
-        /* பெட்டி நிழல் முழுமையாக நீக்கப்பட்டுள்ளது */
         .red-news-box {
             background: rgba(204, 0, 0, 0.95);
             padding: 30px 20px;
@@ -98,7 +97,7 @@
             text-align: center;
             position: relative;
             display: none; 
-            box-shadow: none; /* Shadow removed to fix your issue */
+            box-shadow: none; 
         }
 
         .headline {
@@ -107,11 +106,11 @@
             font-weight: 900;
             font-family: 'Tamil039', 'Poppins', sans-serif;
             margin: 0;
-            line-height: 1.7; /* Increased to 2 as requested */
+            line-height: 1.7; 
             letter-spacing: 1px;
             word-spacing: -10px;
             padding-top: 10px;
-            text-shadow: 2px 2px 10px rgba(0,0,0,0.8); /* Text-only shadow */
+            text-shadow: 2px 2px 10px rgba(0,0,0,0.8); 
         }
 
         .owl-carousel .owl-item { height: 100%; }
@@ -133,32 +132,40 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // இங்கே உங்கள் புதிய RSS லிங்கை கொடுக்கவும்
-        const BLOG_RSS = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=rss";
+        // மூன்றாம் தரப்பு API தவிர்க்கப்பட்டு, Blogger-இன் நேரடி JSON பயன்படுத்தப்பட்டுள்ளது
+        const BLOG_JSON = "https://rss.rtbs.in/feeds/posts/default/-/shorts?alt=json";
 
         async function initSyncSlider() {
             try {
-                const response = await fetch(`https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS)}`);
+                const response = await fetch(BLOG_JSON);
                 const data = await response.json();
 
-                if (data.status === 'ok') {
+                if (data.feed && data.feed.entry) {
                     let imgHtml = "";
                     let titleHtml = "";
 
-                    data.items.forEach(item => {
-                        // பிழை வராமல் தடுப்பதற்கான புதிய பாதுகாப்பான கோடு
-                        let rawImg = item.thumbnail || (item.enclosure && item.enclosure.link) || "";
+                    data.feed.entry.forEach(item => {
+                        let title = item.title.$t || "";
                         
-                        // படம் இருந்தால் அளவை மாற்றும், இல்லையென்றால் ஒரு கறுப்பு நிற டீஃபால்ட் படம் வரும்
-                        let finalImg = rawImg ? rawImg.replace('s72-c', 's1600').replace('w72-h72-p-k-no-nu', 's1600') : "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
+                        // 1. Thumbnail உள்ளதா எனப் பார்த்தல்
+                        let rawImg = item.media$thumbnail ? item.media$thumbnail.url : "";
+                        
+                        // 2. இல்லையென்றால் Content-ல் உள்ள முதல் படத்தை எடுத்தல்
+                        if (!rawImg && item.content && item.content.$t) {
+                            let imgMatch = item.content.$t.match(/<img[^>]+src="([^">]+)"/);
+                            if (imgMatch) rawImg = imgMatch[1];
+                        }
+
+                        // 3. படத்தைத் தரமான அளவிற்க்கு (s1600) மாற்றுதல்
+                        let finalImg = rawImg ? rawImg.replace(/\/s\d+(\-c)?\//, '/s1600/') : "https://via.placeholder.com/1080x1920/000000/111111?text=No+Image";
 
                         imgHtml += `<div class="item"><img src="${finalImg}" class="slide-img"></div>`;
                         
-                        if(item.title && item.title.trim() !== "") {
+                        if (title.trim() !== "") {
                             titleHtml += `
                                 <div class="item">
                                     <div class="red-news-box" style="display:block;">
-                                        <h2 class="headline">${item.title}</h2>
+                                        <h2 class="headline">${title}</h2>
                                     </div>
                                 </div>`;
                         } else {
@@ -182,6 +189,8 @@
                     $('#image-slider').on('translate.owl.carousel', function(event) {
                         $titleSlider.trigger('to.owl.carousel', [event.item.index, 1000]);
                     });
+                } else {
+                    console.warn("No posts found for this label.");
                 }
             } catch (err) { console.error("Slider Error: ", err); }
         }

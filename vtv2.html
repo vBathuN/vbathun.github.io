@@ -20,6 +20,14 @@
             font-weight: bold; font-display: swap; 
         }
 
+        /* எழுத்துக்கள் தெளிவாகத் தெரிய (Anti-aliasing) */
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
+            box-sizing: border-box;
+        }
+
         .logo-fixed {
             position: absolute;
             bottom: 90%; 
@@ -104,7 +112,7 @@
             color: #fff;
             font-size: 36px;
             font-weight: 900;
-            font-family: 'Tamil039', 'Poppins', sans-serif;
+            font-family: 'Tamil039', sans-serif;
             margin: 0;
             line-height: 2; 
             letter-spacing: 1px;
@@ -112,8 +120,6 @@
             padding-top: 10px;
             text-shadow: 2px 2px 10px rgba(0,0,0,0.8); 
         }
-
-        .owl-carousel .owl-item { height: 100%; }
 
         /* 3. Outro Book Section Styles */
         .book-wrapper {
@@ -142,11 +148,14 @@
             rotate: 0 1 0 calc(clamp(0, var(--c) - var(--i), 1) * -180deg);
         }
 
+        /* பக்கங்கள் மங்காமல் இருக்க */
         .front, .back {
             position: relative; flex: none; width: 100%; backface-visibility: hidden;
             overflow: hidden; background-color: #fff; display: flex; flex-flow: column nowrap;
             justify-content: center; align-items: center; padding: 2.5em 1.5em;
             border: 1px solid #c0c0c0; box-shadow: inset 0 0 30px rgba(0,0,0,0.1); 
+            -webkit-backface-visibility: hidden; 
+            transform: translateZ(0); /* GPU acceleration for sharpness */
         }
 
         .back { translate: -100% 0; rotate: 0 1 0 180deg; }
@@ -160,10 +169,22 @@
             font-family: 'Tamil039', 'Roboto', sans-serif;
         }
 
+        /* முதல் பக்கத் தலைப்பு ஸ்டைல் */
+        .book-title {
+            font-family: 'Tamil039', serif;
+            color: #c60203;
+            font-size: 1.2em;
+            text-align: center;
+            line-height: 1.6;
+            font-weight: 900;
+        }
+
         .footer-text { position: absolute; bottom: 1em; width: 100%; left: 0; text-align: center; font-size: 0.6em; color: #c60203; font-weight: bold; }
-        .outro-box { text-align: center; width: 100%; }
-        .outro-title { color: #8b5a2b; font-size: 0.9em; font-weight: bold; margin-bottom: 10px; line-height: 1.8; }
-        .outro-sub { color: #3e2723; font-size: 0.8em; margin-bottom: 10px; }
+        
+        /* அவுட்ரோ ஸ்டைல் - தெளிவாக்கப்பட்டுள்ளது */
+        .outro-box { text-align: center; width: 100%; font-family: 'Tamil039', sans-serif; }
+        .outro-title { color: #8b5a2b; font-size: 1em; font-weight: bold; margin-bottom: 10px; line-height: 1.8; }
+        .outro-sub { color: #3e2723; font-size: 0.8em; margin-bottom: 10px; font-weight: bold; }
         .outro-action { font-size: 0.65em; color: #d32f2f; font-weight: bold; line-height: 1.5; }
     </style>
 </head>
@@ -187,7 +208,6 @@
     <script src="assets/vendors/owl-carousel/owl.carousel.min.js"></script>
 
     <script>
-        // --- Slider Logic ---
         const BLOG_JSONP = "https://rss.rtbs.in/feeds/posts/default/-/shortsslider?alt=json-in-script";
 
         function initSyncSlider() {
@@ -272,7 +292,10 @@
           chunks.forEach(c => items.push({ text: c }));
           items.push({ isOutro: true });
           let totalSpreads = Math.ceil(items.length / 2);
-          let html = `<div class="page"><div class="front" style="background:transparent;border:none;box-shadow:none;"></div><div class="back"><h2 style="color:#c60203;font-size:1.1em;text-align:center;line-height:1.6;">${items[0].text}</h2><div style="width:50px;height:4px;background:#c60203;margin:15px auto;"></div></div></div>`;
+          
+          // முதல் பக்கம் (Back cover of spread 0) - Titlesharpness added
+          let html = `<div class="page"><div class="front" style="background:transparent;border:none;box-shadow:none;"></div><div class="back"><h2 class="book-title">${items[0].text}</h2><div style="width:50px;height:4px;background:#c60203;margin:15px auto;"></div></div></div>`;
+          
           for(let i = 1; i <= totalSpreads; i++) {
             let f = items[i*2-1]; let b = items[i*2];
             let fT = f ? (f.isOutro ? getOutro() : `<p class="content-text">${f.text}</p>`) : "";
@@ -281,9 +304,11 @@
           }
           book.innerHTML = html; initFlipBook(book, totalSpreads);
         }
+
         function getOutro() {
           return `<div class="outro-box"><div class="outro-title">விதிகள் அறிவோம்,<br>விவேகத்துடன் செயல்படுவோம்!</div><div class="outro-sub">இது நமது <strong>சட்டவியல்</strong></div><div class="outro-action">Subscribe: Jurisprudence Tamil<br>Like & Share! 👍</div></div>`;
         }
+
         function initFlipBook(el, total) {
           let curr = 1; const pgs = el.querySelectorAll(".page");
           pgs.forEach((p, i) => p.style.setProperty("--i", i));

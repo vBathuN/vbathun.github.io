@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>LawTamil Shorts Slider</title>
+  
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.carousel.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/assets/owl.theme.default.min.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+
+  <style>
+    @font-face {
+      font-family: 'Tamil039';
+      src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
+      font-weight: bold; font-display: swap; 
+    }
+
+    * { box-sizing: border-box; }
+    body, html { 
+      margin: 0; padding: 0; height: 100%; width: 100%; 
+      overflow: hidden; background: #000; 
+      font-family: 'Tamil039', sans-serif;
+    }
+
+    /* 1. மெயின் கன்டெய்னர் மற்றும் பார்டர் */
+    .main-wrapper {
+      width: 100vw; height: 100vh;
+      position: relative;
+      border: 12px solid #FFD700;
+      background: url('https://via.placeholder.com/1080x1920/222/555?text=Background') no-repeat center center;
+      background-size: cover;
+    }
+
+    /* 2. லோகோ (சட்டவியல்) */
+    .logo-container {
+      position: absolute; top: 40px; left: 50%;
+      transform: translateX(-50%); z-index: 2000;
+      display: flex; align-items: center;
+    }
+    .text-box {
+      background: #c60203; padding: 0 15px; border-radius: 12px 0 0 12px;
+      height: 70px; display: flex; align-items: center; border-top: 1px solid #ff4d4d;
+    }
+    .text-box span {
+      font-size: 45px; font-weight: 900; color: #fff;
+      -webkit-text-stroke: 0.5px #fff; letter-spacing: 2px;
+    }
+    .icon-box {
+      background: linear-gradient(180deg, #0055ff 0%, #002db3 100%);
+      width: 70px; height: 70px; display: flex; justify-content: center;
+      align-items: center; border-radius: 0 12px 12px 0; border-top: 1px solid #6699ff;
+    }
+    .icon-box span { font-size: 40px; animation: flipScale 6s infinite; }
+
+    /* 3. சிவப்பு செய்திப் பெட்டி (Title Slider) */
+    #title-slider-wrap {
+      position: absolute; top: 150px; left: 50%;
+      transform: translateX(-50%); width: 90%; z-index: 1500;
+    }
+    .red-news-box {
+      background: #cc0000; padding: 25px 15px;
+      border: 3px solid #FFD700; border-radius: 15px;
+      text-align: center; box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+    }
+    .headline {
+      color: #fff; font-size: 32px; font-weight: bold;
+      line-height: 1.8; margin: 0;
+    }
+
+    /* 4. புத்தகம் (Flip Book Area) */
+    .book-container {
+      position: absolute; bottom: 80px; width: 100%;
+      display: flex; justify-content: center; align-items: center;
+      perspective: 2000px;
+    }
+    .book {
+      position: relative; display: flex; width: 45vmin;
+      transform-style: preserve-3d; transition: translate 1.2s ease-in-out;
+      translate: calc(min(var(--c), 1) * 50%) 0%;
+    }
+    .page {
+      flex: none; display: flex; width: 100%; font-size: 3.5vmin;
+      transform-style: preserve-3d; transform-origin: left center;
+      transition: rotate 1.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+      translate: calc(var(--i) * -100%) 0px 0px;
+      rotate: 0 1 0 calc(clamp(0, var(--c) - var(--i), 1) * -180deg);
+    }
+    .front, .back {
+      position: relative; flex: none; width: 100%; backface-visibility: hidden;
+      background: #fff; padding: 2em 1em; border: 1px solid #ccc;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+    }
+    .back { translate: -100% 0; rotate: 0 1 0 180deg; }
+    .content-text { text-align: center; line-height: 1.8; font-weight: bold; color: #000; }
+    .footer-url { position: absolute; bottom: 10px; font-size: 0.5em; color: #c60203; font-weight: bold; }
+
+    @keyframes flipScale { 0%, 85% { transform: rotateY(0deg); } 90% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
+  </style>
+</head>
+<body>
+
+  <div class="main-wrapper">
+    <div class="logo-container">
+      <div class="text-box"><span>சட்டவியல்</span></div>
+      <div class="icon-box"><span>⚖️</span></div>
+    </div>
+
+    <div id="title-slider-wrap">
+      <div id="title-slider" class="owl-carousel owl-theme"></div>
+    </div>
+
+    <div class="book-container">
+      <div class="book" id="lawTamilBook"></div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+
+  <script>
+    // JSONP மூலம் டேட்டாவை பெறுதல்
+    const BLOG_URL = "https://feed.rtbs.in/feeds/posts/default/-/shortsslider?alt=json-in-script&callback=handleData";
+
+    function handleData(data) {
+      if (data.feed && data.feed.entry) {
+        let titleHtml = "";
+        const entry = data.feed.entry[0]; // முதல் போஸ்ட் மட்டும்
+        const fullTitle = entry.title.$t;
+        const content = entry.content ? entry.content.$t : "";
+
+        // 1. டைட்டில் ஸ்லைடரில் டைட்டிலை வைத்தல்
+        titleHtml = `<div class="item"><div class="red-news-box"><h2 class="headline">${fullTitle}</h2></div></div>`;
+        $('#title-slider').html(titleHtml).owlCarousel({ items: 1, loop: true, autoplay: true, dots: false });
+
+        // 2. கன்டென்ட்டை பிரித்து புத்தகமாக மாற்றுதல்
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = content;
+        const cleanText = tempDiv.textContent.replace(/\s+/g, ' ').trim();
+        const chunks = chunkText(cleanText, 120);
+        buildBook(fullTitle, chunks);
+      }
+    }
+
+    function chunkText(text, limit) {
+      const words = text.split(' ');
+      let chunks = [], current = '';
+      words.forEach(w => {
+        if ((current + w).length > limit) { chunks.push(current.trim()); current = w + ' '; }
+        else { current += w + ' '; }
+      });
+      if (current.trim()) chunks.push(current.trim());
+      return chunks;
+    }
+
+    function buildBook(title, chunks) {
+      const book = document.getElementById('lawTamilBook');
+      let html = `<div class="page"><div class="front" style="background:transparent;border:none;"></div><div class="back"><h2 style="color:#c60203;text-align:center;">${title}</h2></div></div>`;
+      
+      chunks.forEach((text, i) => {
+        html += `
+          <div class="page">
+            <div class="front"><p class="content-text">${text}</p><div class="footer-url">lawtamil.in</div></div>
+            <div class="back"><p class="content-text">${text}</p><div class="footer-url">Jurisprudence Tamil</div></div>
+          </div>`;
+      });
+
+      book.innerHTML = html;
+      initFlip(chunks.length + 1);
+    }
+
+    function initFlip(total) {
+      let curr = 1;
+      const el = document.getElementById('lawTamilBook');
+      const pgs = el.querySelectorAll(".page");
+      pgs.forEach((p, i) => p.style.setProperty("--i", i));
+      
+      setInterval(() => {
+        curr++;
+        if (curr > total) curr = 1;
+        el.style.setProperty("--c", curr);
+      }, 5000);
+    }
+
+    // ஸ்கிரிப்ட் லோடிங்
+    const s = document.createElement('script');
+    s.src = BLOG_URL;
+    document.body.appendChild(s);
+  </script>
+</body>
+</html>

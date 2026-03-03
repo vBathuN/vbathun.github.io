@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <title>LawTamil Live AI - Hybrid Mode</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@500;700&display=swap');
+        
+        @font-face {
+            font-family: 'Tamil039';
+            src: url('https://www.rtbs.in/font/Tamil039.woff2') format('woff2');
+            font-weight: bold; font-display: swap;
+        }
+
+        body, html { 
+            margin: 0; padding: 0; height: 100vh; 
+            overflow: hidden; background-color: transparent; 
+        }
+
+        #voice-controls {
+            position: fixed; top: 10px; left: 10px; z-index: 1000;
+            background: rgba(255,255,255,0.2); padding: 5px; border-radius: 8px;
+        }
+        #vBtn { 
+            cursor: pointer; font-size: 11px; padding: 5px 10px; 
+            border: 1px solid #fff; background: #fff; color: #000;
+            font-weight: bold; border-radius: 5px;
+        }
+
+        .news-wrapper {
+            position: absolute; top: 50%; left: 0; width: 100%;
+            transform: translateY(-50%); display: flex; justify-content: center;
+        }
+
+        .news-box {
+            background-color: #c60203; opacity: 0.95; color: #ffffff;
+            padding: 30px 45px; width: 850px; height: 450px; 
+            overflow: hidden; border: 4px solid #fff; border-radius: 20px;
+            box-shadow: 0px 15px 50px rgba(0,0,0,0.9);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .ml10 {
+            font-family: 'Roboto', 'Tamil039', sans-serif;
+            font-weight: bold; font-size: 32px; 
+            line-height: 2.1; 
+            color: #ffffff; text-align: center; margin: 0;
+            display: -webkit-box; 
+            -webkit-line-clamp: 7; 
+            -webkit-box-orient: vertical; 
+            overflow: hidden; text-overflow: ellipsis;
+        }
+
+        .word { display: inline-block; margin-right: 12px; }
+    </style>
+</head>
+<body onclick="activateAI()">
+
+    <div id="voice-controls">
+        <button onclick="toggleVoice(event)" id="vBtn">குரல்: பெண் (A)</button>
+    </div>
+
+    <div class="news-wrapper">
+        <div class="news-box" id="mainBox" style="display:none;">
+            <h1 class="ml10" id="ai-content">சட்ட விவரங்களைத் திரட்டுகிறேன்...</h1>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/2.0.2/anime.min.js"></script>
+
+    <script>
+        // உங்கள் புதிய Apps Script URL (API Key இதனுள் பாதுகாப்பாக இருக்கும்)
+        const GATEWAY_URL = 'https://script.google.com/macros/s/AKfycbzlXs2SeeQ9QYf7MJ2VK0Yj1EKbfOvlbfQJTLCrurSRC6eGgCs7aeF3yGGOWqkgwfI3qw/exec';
+        const TTS_URL = 'https://texttospeech.googleapis.com/v1/text:synthesize?key=YOUR_TTS_API_KEY'; // TTS Key மட்டும் இங்கே தேவை
+
+        const bc = new BroadcastChannel('lawtamil_live_sync');
+
+        let currentAudio = null;
+        let isQuestionSpoken = false; 
+        let selectedVoice = 'ta-IN-Wavenet-A'; 
+        let gender = 'FEMALE';
+        let lastQuery = "";
+
+        bc.onmessage = (ev) => {
+            const { result, query } = ev.data;
+            displayAndSpeak(result, query);
+        };
+
+        function toggleVoice(event) {
+            event.stopPropagation();
+            const btn = document.getElementById('vBtn');
+            if (gender === 'FEMALE') {
+                gender = 'MALE'; selectedVoice = 'ta-IN-Wavenet-B';
+                btn.innerText = "குரல்: ஆண் (B)";
+            } else {
+                gender = 'FEMALE'; selectedVoice = 'ta-IN-Wavenet-A';
+                btn.innerText = "குரல்: பெண் (A)";
+            }
+        }
+
+        function activateAI() { checkClipboard(); }
+
+        async function checkClipboard() {
+            try {
+                const text = await navigator.clipboard.readText();
+                if (text && text.trim() !== "" && text !== lastQuery) {
+                    if (text.includes('{') || text.includes('<script')) return;
+                    lastQuery = text;
+                    isQuestionSpoken = false; 
+                    getGeminiResponse(text);
+                }
+            } catch (e) {}
+        }
+
+        setInterval(checkClipboard, 1500);
+
+        async function getGeminiResponse(query) {
+            const box = document.getElementById('mainBox');
+            const txt = document.getElementById('ai-content');
+            box.style.display = 'flex';
+            txt.innerText = "சட்ட விவரங்களைத் திரட்டுகிறேன்...";
+
+            const prompt = !isQuestionSpoken 
+                ? `சட்ட நிபுணராக, கேள்வியையும் அதற்கான பதிலையும் சேர்த்துச் சொல். பதில் 35 வார்த்தைக்குள் இருக்கட்டும். கேள்வி: ${query}`
+                : `கண்டிப்பாகக் கேள்வியைச் சொல்லாதே. நேரடிப் பதிலை மட்டும் சொல். பதில் 35 வார்த்தைக்குள். கேள்வி: ${query}`;
+
+            try {
+                // Apps Script-க்கு போஸ்ட் (POST) செய்கிறோம்
+                const response = await fetch(GATEWAY_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({ prompt: prompt })
+                });
+                const data = await response.json();
+                const result = data.candidates[0].content.parts[0].text;
+                
+                bc.postMessage({ result, query });
+                
+                isQuestionSpoken = true; 
+                displayAndSpeak(result, query);
+            } catch (e) { txt.innerText = "இணைப்பில் பிழை!"; }
+        }
+
+        async function playTTS(text, originalQuery) {
+            try {
+                if (currentAudio) { currentAudio.pause(); currentAudio.currentTime = 0; }
+                const res = await fetch(TTS_URL, {
+                    method: 'POST',
+                    body: JSON.stringify({
+                        input: { text: text },
+                        voice: { languageCode: 'ta-IN', name: selectedVoice, ssmlGender: gender },
+                        audioConfig: { audioEncoding: 'MP3', speakingRate: 1.1, pitch: gender === 'MALE' ? -1.5 : 0.0 }
+                    })
+                });
+                const data = await res.json();
+                currentAudio = new Audio("data:audio/mp3;base64," + data.audioContent);
+                currentAudio.onended = () => { setTimeout(() => { getGeminiResponse(originalQuery); }, 1000); };
+                currentAudio.play();
+            } catch (e) {}
+        }
+
+        function displayAndSpeak(text, originalQuery) {
+            const box = document.getElementById('mainBox');
+            box.style.display = 'flex';
+            const txtContainer = document.getElementById('ai-content');
+            const words = text.split(" ");
+            txtContainer.innerHTML = words.map(w => `<span class='word'>${w}</span>`).join("");
+            anime.timeline().add({
+                targets: '.ml10 .word',
+                rotateY: [-90, 0],
+                duration: 800,
+                delay: (el, i) => 50 * i
+            });
+            playTTS(text, originalQuery);
+        }
+    </script>
+</body>
+</html>
